@@ -14,9 +14,9 @@ from torch.utils.data import DataLoader, TensorDataset, Dataset
 from grokfast import *
 import wandb
 
-class NeuralOptimizer(nn.Module):
+class NeuralGrad(nn.Module):
     def __init__(self, hidden_dim):
-        super(NeuralOptimizer,self).__init__()
+        super(NeuralGrad,self).__init__()
         self.mlp = nn.Sequential(
             nn.Linear(1, hidden_dim * 4),
             nn.GELU(),
@@ -566,7 +566,7 @@ def main(args):
         memory_size=args.memory_size
     ).to(device)
 
-    neural_optimizer = NeuralOptimizer(
+    neural_optimizer = NeuralGrad(
         hidden_dim=args.neural_hidden_dim
     ).to(device)
 
