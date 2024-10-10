@@ -27,11 +27,19 @@ class NeuralOptimizer(nn.Module):
             nn.Linear(hidden_dim * 4, 1)
         )
 
-        self.mask = nn.Sequential(
-            nn.Linear(1, hidden_dim*4),
+        # self.mask = nn.Sequential(
+        #     nn.Linear(1, hidden_dim*4),
+        #     nn.ReLU(),
+        #     # nn.Linear(hidden_dim*4, hidden_dim*4),
+        #     # nn.ReLU(),
+        #     nn.Linear(hidden_dim*4, 1),
+        #     nn.ReLU()
+        # )
+
+        self.mask2 = nn.Sequential(
+            nn.Linear(1, hidden_dim*6), ## wider can accelerate the grokking process
             nn.ReLU(),
-            nn.Dropout(0.2),
-            nn.Linear(hidden_dim*4, 1),
+            nn.Linear(hidden_dim*6, 1),
             nn.ReLU()
         )
 
@@ -52,15 +60,9 @@ class NeuralOptimizer(nn.Module):
     def forward(self, grad):
         g1 = self.mlp(grad)
         p = self.softmax(g1)
-        msk = self.mask(grad)
+        msk = self.mask2(grad)
         x = p * grad + msk * grad
-        #x = torch.exp(p) * grad + self.relu(grad) * torch.exp(1-p)
         return x
-
-        # grad = grad.view(-1, 1, 1) # seq_len, batch_size, input_dim
-        # lstm_out, _  = self.lstm(grad)
-        # x = self.fc(lstm_out)
-        # return x.view(-1,1)
 
 
 class TransformerDecoderBlock(nn.Module):
