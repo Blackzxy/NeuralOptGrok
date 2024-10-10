@@ -566,7 +566,7 @@ def main(args):
         memory_size=args.memory_size
     ).to(device)
 
-    neural_optimizer = NeuralGrad(
+    neural_grad = NeuralGrad(
         hidden_dim=args.neural_hidden_dim
     ).to(device)
 
@@ -634,7 +634,7 @@ def main(args):
     meta_optimizer = getattr(torch.optim, args.optimizer)(
         [
             {
-                "params": neural_optimizer.parameters(),
+                "params": neural_grad.parameters(),
         "lr": 1e-4,
         "weight_decay": args.weight_decay,
         "betas":(args.beta1, args.beta2)
@@ -694,7 +694,7 @@ def main(args):
                         for name, param in model.named_parameters():
                             # print(name, param, param.grad)
                             grad = param.grad.view(-1,1)
-                            modified_grad = neural_optimizer(grad)
+                            modified_grad = neural_grad(grad)
                             param.grad = modified_grad.view(param.shape)
                         
                         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
