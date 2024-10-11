@@ -637,7 +637,7 @@ def main(args):
         [
             {
                 "params": neural_grad.parameters(),
-        "lr": 1e-4,
+        "lr": 1e-3,
         "weight_decay": args.weight_decay,
         "betas":(args.beta1, args.beta2)
         },
