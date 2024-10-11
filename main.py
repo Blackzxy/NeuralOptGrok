@@ -15,31 +15,39 @@ from grokfast import *
 import wandb
 
 class NeuralGrad(nn.Module):
-    def __init__(self, hidden_dim):
+    def __init__(self, hidden_dim=128, n_layers=2, alpha=16, beta=6):
         super(NeuralGrad,self).__init__()
-        self.mlp = nn.Sequential(
-            nn.Linear(1, hidden_dim * 4),
-            nn.GELU(),
-            nn.Dropout(0.2),
-            nn.Linear(hidden_dim*4, hidden_dim*4),
-            nn.GELU(),
-            nn.Dropout(0.2),
-            nn.Linear(hidden_dim * 4, 1)
-        )
 
-        # self.mask = nn.Sequential(
-        #     nn.Linear(1, hidden_dim*4),
-        #     nn.ReLU(),
-        #     # nn.Linear(hidden_dim*4, hidden_dim*4),
-        #     # nn.ReLU(),
-        #     nn.Linear(hidden_dim*4, 1),
-        #     nn.ReLU()
-        # )
+        self.alpha = alpha
+        self.beta = beta
+
+        hidden_dim_alpha = int(self.alpha * hidden_dim)
+        hidden_dim_beta = int(self.beta * hidden_dim)
+
+        layers = []
+
+        layers.append(nn.Linear(1, hidden_dim_alpha))
+        layers.append(nn.GELU())
+        layers.append(nn.Dropout(0.1))
+
+        for i in range(n_layers-1):
+            if i == n_layers-2:
+                layers.append(nn.Linear(hidden_dim_alpha, 1))
+            else:
+                layers.append(nn.Linear(hidden_dim_alpha, hidden_dim_alpha))
+                layers.append(nn.GELU())
+                layers.append(nn.Dropout(0.1))
+        
+        self.mlp = nn.Sequential(*layers)
+
+
 
         self.mask2 = nn.Sequential(
-            nn.Linear(1, hidden_dim*6), ## wider can accelerate the grokking process
+            nn.Linear(1, hidden_dim_beta), ## wider can accelerate the grokking process
             nn.ReLU(),
-            nn.Linear(hidden_dim*6, 1),
+            nn.Linear(hidden_dim_beta, hidden_dim_beta),
+            nn.ReLU(),
+            nn.Linear(hidden_dim_beta, 1),
             nn.ReLU()
         )
 
@@ -47,15 +55,6 @@ class NeuralGrad(nn.Module):
         self.relu = nn.ReLU()
 
 
-
-        # self.lstm = nn.LSTM(1, hidden_dim, batch_first=True, num_layers=2)
-        # self.fc = nn.Sequential(
-        #     nn.Linear(hidden_dim, hidden_dim*2),
-        #     nn.GELU(),
-        #     nn.Linear(hidden_dim*2, hidden_dim),
-        #     nn.GELU(),
-        #     nn.Linear(hidden_dim,1)
-        # )
     
     def forward(self, grad):
         g1 = self.mlp(grad)
@@ -567,7 +566,10 @@ def main(args):
     ).to(device)
 
     neural_grad = NeuralGrad(
-        hidden_dim=args.neural_hidden_dim
+        hidden_dim=args.neural_hidden_dim,
+        n_layers=args.neural_layers,
+        alpha=args.neural_alpha,
+        beta=args.neural_beta,
     ).to(device)
 
     # model = StatefulTransformerDecoder(
@@ -680,7 +682,55 @@ def main(args):
                 # print(f"Max index: {input.max().item()}, Min index: {input.min().item()}")
                 # sys.exit(0)
                 if is_train:
-                    for _ in range(inner_steps):
+
+                    if args.neural_grad:
+                        for _ in range(inner_steps):
+
+                            with torch.set_grad_enabled(is_train):
+                                logits = model(input[:-1])
+                                # calculate loss only on the answer part of the equation (last element
+                                loss = F.cross_entropy(logits[-1], input[-1])
+                                total_loss += loss.item() * input.shape[-1]
+                            
+                            model.zero_grad()
+                            loss.backward() #(retain_graph=True)
+
+                            for name, param in model.named_parameters():
+                                # print(name, param, param.grad)
+                                grad = param.grad.view(-1,1)
+                                modified_grad = neural_grad(grad)
+                                param.grad = modified_grad.view(param.shape)
+                            
+                            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+
+                            # #######
+
+                            # trigger = i < 500 if args.two_stage else False
+
+                            # if args.filter == "none":
+                            #     pass
+                            # elif args.filter == "ma":
+                            #     grads = gradfilter_ma(model, grads=grads, window_size=args.window_size, lamb=args.lamb, trigger=trigger)
+                            # elif args.filter == "ema":
+                            #     grads = gradfilter_ema(model, grads=grads, alpha=args.alpha, lamb=args.lamb)
+                            # else:
+                            #     raise ValueError(f"Invalid gradient filter type `{args.filter}`")
+
+                            # #######
+
+                            optimizer.step()
+                            scheduler.step()
+                        
+                        final_loss = F.cross_entropy(model(input[:-1])[-1], input[-1])
+                        print(final_loss)
+                        meta_optimizer.zero_grad()
+                        final_loss.backward()
+                        meta_optimizer.step()
+                        
+                        i += 1
+                    
+                    else:
+                       
 
                         with torch.set_grad_enabled(is_train):
                             logits = model(input[:-1])
@@ -691,39 +741,28 @@ def main(args):
                         model.zero_grad()
                         loss.backward()
 
-                        for name, param in model.named_parameters():
-                            # print(name, param, param.grad)
-                            grad = param.grad.view(-1,1)
-                            modified_grad = neural_grad(grad)
-                            param.grad = modified_grad.view(param.shape)
                         
-                        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 
-                        # #######
+                        #######
 
-                        # trigger = i < 500 if args.two_stage else False
+                        trigger = i < 500 if args.two_stage else False
 
-                        # if args.filter == "none":
-                        #     pass
-                        # elif args.filter == "ma":
-                        #     grads = gradfilter_ma(model, grads=grads, window_size=args.window_size, lamb=args.lamb, trigger=trigger)
-                        # elif args.filter == "ema":
-                        #     grads = gradfilter_ema(model, grads=grads, alpha=args.alpha, lamb=args.lamb)
-                        # else:
-                        #     raise ValueError(f"Invalid gradient filter type `{args.filter}`")
+                        if args.filter == "none":
+                            pass
+                        elif args.filter == "ma":
+                            grads = gradfilter_ma(model, grads=grads, window_size=args.window_size, lamb=args.lamb, trigger=trigger)
+                        elif args.filter == "ema":
+                            grads = gradfilter_ema(model, grads=grads, alpha=args.alpha, lamb=args.lamb)
+                        else:
+                            raise ValueError(f"Invalid gradient filter type `{args.filter}`")
 
-                        # #######
+                        #######
 
                         optimizer.step()
                         scheduler.step()
+            
+                        i += 1
                     
-                    final_loss = F.cross_entropy(model(input[:-1])[-1], input[-1])
-                    print(final_loss)
-                    meta_optimizer.zero_grad()
-                    final_loss.backward()
-                    meta_optimizer.step()
-                    
-                    i += 1
 
 
                 with torch.set_grad_enabled(is_train):
@@ -842,6 +881,10 @@ if __name__ == "__main__":
     parser.add_argument("--memory_size", type=int, default=32)
     parser.add_argument("--inner_steps", type=int, default=10)
     parser.add_argument("--neural_hidden_dim", type=int, default=256)
+    parser.add_argument("--neural_layers", type=int, default=3)
+    parser.add_argument("--neural_alpha", type=int, default=16)
+    parser.add_argument("--neural_beta",type=int, default=6)
+    parser.add_argument("--neural_grad", action='store_true')
 
     # Grokfast
     parser.add_argument("--filter", type=str, choices=["none", "ma", "ema", "fir", "meta"], default="none")
