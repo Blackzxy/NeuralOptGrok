@@ -689,7 +689,7 @@ def main(args):
                             total_loss += loss.item() * input.shape[-1]
                         
                         model.zero_grad()
-                        loss.backward(retain_graph=True)
+                        loss.backward()
 
                         for name, param in model.named_parameters():
                             # print(name, param, param.grad)
