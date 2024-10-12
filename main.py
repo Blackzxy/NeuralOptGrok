@@ -41,18 +41,23 @@ class NeuralGrad(nn.Module):
         self.mlp = nn.Sequential(*layers)
 
 
+        layers = []
 
-        self.mask2 = nn.Sequential(
-            nn.Linear(1, hidden_dim_beta), ## wider can accelerate the grokking process
-            nn.ReLU(),
-            nn.Linear(hidden_dim_beta, hidden_dim_beta),
-            nn.ReLU(),
-            nn.Linear(hidden_dim_beta, 1),
-            nn.ReLU()
-        )
+        layers.append(nn.Linear(1, hidden_dim_beta))
+        layers.append(nn.ReLU())
 
+        for i in range(n_layers-1):
+            if i == n_layers-2:
+                layers.append(nn.Linear(hidden_dim_beta, 1))
+                layers.append(nn.ReLU())
+            else:
+                layers.append(nn.Linear(hidden_dim_beta, hidden_dim_beta))
+                layers.append(nn.ReLU())
+
+        self.mask2 = nn.Sequential(*layers)
+        
         self.softmax = nn.Softmax(dim=-1)
-        self.relu = nn.ReLU()
+
 
 
     
@@ -61,6 +66,222 @@ class NeuralGrad(nn.Module):
         p = self.softmax(g1)
         msk = self.mask2(grad)
         x = p * grad + msk * grad
+        return x
+
+
+class TransformerDecoderBlock(nn.Module):
+    def __init__(self, dim, num_heads):
+        super().__init__()
+        self.self_attn = nn.MultiheadAttention(dim, num_heads)
+        self.norm1 = nn.LayerNorm(dim)
+        self.norm2 = nn.LayerNorm(dim)
+        self.ffn = nn.Sequential(
+        nn.Linear(dim, 4 * dim),
+        nn.GELU(),
+        nn.Linear(4 * dim, dim)
+        )
+
+    def forward(self, x):
+        """
+        x: (seq_len, batch_size, dim)
+        """
+        # Self-attention (preserves shape)
+        attn_output, _ = self.self_attn(x, x, x)
+        x = self.norm1(x + attn_output) # Residual connection
+        # Feedforward network (preserves shape)
+        ffn_output = self.ffn(x)
+        x = self.norm2(x + ffn_output) # Residual connection
+        return x # Shape: (seq_len, batch_size, dim)
+
+class MemoryModule(nn.Module):
+    def __init__(self, memory_size, dim, num_heads=4):
+        super().__init__()
+        self.memory_size = memory_size
+        self.dim = dim
+        # Memory initialized as learnable parameters
+        self.memory = nn.Parameter(torch.zeros(memory_size, dim), requires_grad=True)
+
+    def read(self, query):
+        ## query: 1, dim x memory.T: dim, memory_size -> 1, ms
+        attn_weights = F.softmax(torch.matmul(query, self.memory.T), dim=-1)
+        return torch.matmul(attn_weights, self.memory) # 1, dim
+
+    def write(self, input_vector):
+        self.memory.data += input_vector.mean(dim=0).data.unsqueeze(0)
+
+
+class StatefulTransformerDecoder(nn.Module):
+    def __init__(self, dim=128, num_layers=2, num_heads=4, num_tokens=100, seq_len=10, memory_size=5):
+        super().__init__()
+        self.dim = dim
+        self.num_layers = num_layers
+        self.seq_len = seq_len
+
+        # Embedding layers
+        self.token_embedding = nn.Embedding(num_tokens, dim)
+        self.position_embedding = nn.Embedding(seq_len, dim)
+
+        # Transformer Decoder blocks
+        self.layers = nn.ModuleList([TransformerDecoderBlock(dim, num_heads) for _ in range(num_layers)])
+
+        # Memory module
+        self.memory_module = MemoryModule(memory_size, dim, num_heads)
+
+        # Output projection
+        self.norm = nn.LayerNorm(dim)
+        self.fc_out = nn.Linear(dim, num_tokens)
+
+    def forward(self, x):
+        """
+        x: (seq_len, batch_size)
+        """
+        seq_len = x.size(0)
+        batch_size = x.size(1)
+
+        # Get token embeddings
+        x = self.token_embedding(x) # Shape: (seq_len, batch_size, dim)
+
+        # Add positional embeddings
+        position_ids = torch.arange(seq_len, device=x.device).unsqueeze(1) # Shape: (seq_len, 1)
+        x = x + self.position_embedding(position_ids).expand_as(x) # Shape: (seq_len, batch_size, dim)
+
+        # Pass through Transformer layers
+        for layer in self.layers:
+            x = layer(x) # Shape: (seq_len, batch_size, dim)
+
+            # Memory interaction after each layer
+            memory_output = self.memory_module(x)
+            x = x + memory_output # Shape: (seq_len, batch_size, dim)
+
+        # Update memory using the mean of the current state
+        current_state = x.mean(dim=0) # Shape: (batch_size, dim)
+        self.memory_module.update_memory(current_state)
+
+        # Final normalization and projection
+        x = self.norm(x) # Shape: (seq_len, batch_size, dim)
+        logits = self.fc_out(x) # Shape: (seq_len, batch_size, num_tokens)
+
+        return logits
+
+
+class RecurrentMemory(nn.Module):
+    def __init__(self, memory_size, dim):
+        super(RecurrentMemory, self).__init__()
+        self.memory_size = memory_size
+        self.dim = dim
+
+        self.memory = nn.Parameter(torch.zeros(memory_size, dim), requires_grad=False)
+
+    
+    def forward(self, hidden_states):
+        '''
+        hidden_states: seq_len, batch_size, dim
+        '''
+        new_memory = torch.cat([self.memory, hidden_states], dim=0)
+        new_memory = new_memory[-self.memory_size:]
+        self.memory = nn.Parameter(new_memory.detach(), requires_grad=False)
+        return self.memory
+
+class RecurrentMemoryTransformerBlock(nn.Module):
+    def __init__(self, dim, num_heads, ff_dim):
+        super(RecurrentMemoryTransformerBlock, self).__init__()
+        self.self_attn = nn.MultiheadAttention(
+            embed_dim=dim,
+            num_heads=num_heads
+        )
+        self.norm1 = nn.LayerNorm(dim)
+        self.ff = nn.Sequential(
+            nn.Linear(dim, ff_dim),
+            nn.ReLU(),
+            nn.Linear(ff_dim, dim)
+        )
+        self.norm2 = nn.LayerNorm(dim)
+       
+    
+    def forward(self, x, memory):
+        '''
+        x: seq_len, batch_size, dim
+        memory: memory_size, batch_size, dim
+        '''
+        print(memory.shape, x.shape)
+        memory = memory.unsqueeze(1)
+        combined_input = torch.cat([memory, x], dim=0) # seq_len+memory_size, batch_size, dim
+
+        attn_output, _ = self.self_attn(combined_input, combined_input, combined_input)
+
+        attn_output = attn_output[-x.size(0):] # seq_len, batch_size, dim
+
+        x = x + attn_output
+        x = self.norm1(x)
+
+        ff_output = self.ff(x)
+
+        x = x + ff_output
+        x = self.norm2(x)
+
+        return x
+
+class RecurrentMemoryTransformer(nn.Module):
+    def __init__(self, num_tokens, dim, num_heads, ff_dim, num_layers, memory_size, seq_len):
+        super(RecurrentMemoryTransformer, self).__init__()
+        self.embedding = nn.Embedding(num_tokens, dim)
+        self.transformer_layer = nn.ModuleList([
+            nn.TransformerEncoderLayer(dim, num_heads) for _ in range(num_layers)
+        ])
+        self.memory_module = MemoryModule(memory_size,dim)
+        self.fc_out = nn.Linear(dim, num_tokens)
+    
+
+    def forward(self, x):
+        x = self.embedding(x) # seq_len, batch_size, dim
+
+        memory_state = torch.zeros(1, x.size(-1)).to(x.device) # 1, dim
+
+        for t in range(x.size(0)):
+            memory_read = self.memory_module.read(memory_state) # 1, dim
+
+            combined_input = x[t] + memory_read # batch, dim
+
+            for layer in self.transformer_layer:
+                combined_input = layer(combined_input.unsqueeze(0)).squeeze(0) # batch dim
+            
+            memory_state = combined_input
+            self.memory_module.write(combined_input)
+        
+        output = self.fc_out(combined_input)
+        return output
+
+
+class RecurrentTransformerBlock(nn.Module):
+    def __init__(self, dim, num_heads, ff_dim):
+        super(RecurrentTransformerBlock, self).__init__()
+        self.self_attn = nn.MultiheadAttention(
+            embed_dim=dim,
+            num_heads=num_heads
+        )
+        self.norm1 = nn.LayerNorm(dim)
+        self.ff = nn.Sequential(
+            nn.Linear(dim, ff_dim),
+            nn.ReLU(),
+            nn.Linear(ff_dim, dim)
+        )
+        self.norm2 = nn.LayerNorm(dim)
+    
+    def forward(self, x, memory):
+        combined_input = torch.cat([memory, x], dim=0)
+
+        attn_output, _ = self.self_attn(combined_input, combined_input, combined_input)
+
+        attn_output = attn_output[-x.size(0):]
+
+        x = x + attn_output
+        x = self.norm1(x)
+
+        ff_output = self.ff(x)
+
+        x = x + ff_output
+        x = self.norm2(x)
+
         return x
 
 
@@ -113,6 +334,9 @@ class Decoder(nn.Module):
         # self.ln_f = nn.LayerNorm(dim)
         self.head = nn.Linear(dim, num_tokens, bias=False)
 
+        # self.memory_module = MemoryModule(memory_size=memory_size,dim=dim)
+        # self.memory_state = nn.Parameter(torch.randn(1, dim), requires_grad=True)
+
     def forward(self, x):
         # print(x.shape)
         # sys.exit(0)
@@ -121,6 +345,29 @@ class Decoder(nn.Module):
         positions = torch.arange(x.shape[0], device=x.device).unsqueeze(1)
         h = h + self.position_embeddings(positions).expand_as(h)
 
+        #print("H: ", h.shape)
+
+        
+        #print("Memory: ", memory_state.shape)
+
+        # for t in range(h.size(0)): # seq_len
+        #     memory_read = self.memory_module.read(self.memory_state) # 1, dim
+            
+
+        #     combined_input = h[t] + memory_read # batch, dim
+
+        #     for layer in self.layers:
+        #         combined_input = layer(combined_input.unsqueeze(0)).squeeze(0) # batch dim
+            
+            
+        #     self.memory_state = self.memory_state = nn.Parameter(self.memory_state.data + 0.5 * combined_input.mean(dim=0, keepdim=True).detach())
+        #     self.memory_module.write(combined_input)
+
+ 
+
+        # h = self.ln_f(combined_input) #batch, dim
+        # #print("H: ", h.shape)
+        # logits = self.head(h)
 
         for layer in self.layers:
             h = layer(h)
@@ -319,7 +566,7 @@ def main(args):
     # transformer with 2 layers, width 128, and 4 attention heads"
 
     model = Decoder(
-        dim=args.dim, num_layers=args.n_layers, num_heads=args.n_heads, num_tokens=args.p + 2, seq_len=args.seq_len,
+        dim=args.dim, num_layers=args.n_layers, num_heads=args.n_heads, num_tokens=args.p + 4, seq_len=args.seq_len,
         memory_size=args.memory_size
     ).to(device)
 
@@ -355,8 +602,8 @@ def main(args):
     #data = multiplication_mod_p_data(args.p, eq_token, op_token)
     #dataset = ComputationModDataset(args.p, eq_token=eq_token, op_token=op_token, op_token2=op_token2)
     #dataset = ab_sub_cb_mod_p_data(args.p, eq_token, op_token1, op_token2)
-    #dataset = ac_plus_bd_sub_e_mod_p_data(args.p, eq_token, op_token1, op_token2, op_token3)
-    dataset = ab_mod_p_data(args.p, eq_token, op_token1)
+    dataset = ac_plus_bd_sub_e_mod_p_data(args.p, eq_token, op_token1, op_token2, op_token3)
+    #dataset = ab_mod_p_data(args.p, eq_token, op_token1)
     #data = expression_mod_p_data(args.p, eq_token, op_token, op_token2)
     print(len(dataset))
 
@@ -395,7 +642,7 @@ def main(args):
         [
             {
                 "params": neural_grad.parameters(),
-        "lr": 1e-3,
+        "lr": 1e-4,
         "weight_decay": args.weight_decay,
         "betas":(args.beta1, args.beta2)
         },
