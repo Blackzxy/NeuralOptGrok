@@ -58,14 +58,12 @@ class NeuralGrad(nn.Module):
         
         self.softmax = nn.Softmax(dim=-1)
 
-
-
     
     def forward(self, grad):
         g1 = self.mlp(grad)
         p = self.softmax(g1)
         msk = self.mask2(grad)
-        x = p * grad + msk * grad
+        x = p * grad + msk * grad * p
         return x
 
 
@@ -566,7 +564,7 @@ def main(args):
     # transformer with 2 layers, width 128, and 4 attention heads"
 
     model = Decoder(
-        dim=args.dim, num_layers=args.n_layers, num_heads=args.n_heads, num_tokens=args.p + 4, seq_len=args.seq_len,
+        dim=args.dim, num_layers=args.n_layers, num_heads=args.n_heads, num_tokens=args.p + 2, seq_len=args.seq_len,
         memory_size=args.memory_size
     ).to(device)
 
@@ -602,8 +600,8 @@ def main(args):
     #data = multiplication_mod_p_data(args.p, eq_token, op_token)
     #dataset = ComputationModDataset(args.p, eq_token=eq_token, op_token=op_token, op_token2=op_token2)
     #dataset = ab_sub_cb_mod_p_data(args.p, eq_token, op_token1, op_token2)
-    dataset = ac_plus_bd_sub_e_mod_p_data(args.p, eq_token, op_token1, op_token2, op_token3)
-    #dataset = ab_mod_p_data(args.p, eq_token, op_token1)
+    #dataset = ac_plus_bd_sub_e_mod_p_data(args.p, eq_token, op_token1, op_token2, op_token3)
+    dataset = ab_mod_p_data(args.p, eq_token, op_token1)
     #data = expression_mod_p_data(args.p, eq_token, op_token, op_token2)
     print(len(dataset))
 
@@ -885,7 +883,7 @@ if __name__ == "__main__":
     parser.add_argument("--interval", type=int, default=1000)
     parser.add_argument("--memory_size", type=int, default=32)
     parser.add_argument("--inner_steps", type=int, default=10)
-    parser.add_argument("--neural_hidden_dim", type=int, default=256)
+    parser.add_argument("--neural_hidden_dim", type=int, default=32)
     parser.add_argument("--neural_layers", type=int, default=3)
     parser.add_argument("--neural_alpha", type=int, default=16)
     parser.add_argument("--neural_beta",type=int, default=6)
