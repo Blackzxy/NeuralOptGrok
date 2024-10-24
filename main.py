@@ -14,6 +14,9 @@ from torch.utils.data import DataLoader, TensorDataset, Dataset
 from grokfast import *
 import wandb
 
+
+
+
 class NeuralGrad(nn.Module):
     def __init__(self, hidden_dim=128, n_layers=2, alpha=16, beta=6):
         super(NeuralGrad,self).__init__()
@@ -46,13 +49,17 @@ class NeuralGrad(nn.Module):
         layers.append(nn.Linear(1, hidden_dim_beta))
         layers.append(nn.ReLU())
 
+        # layers.append(nn.Dropout(0.3))
+
         for i in range(n_layers-1):
             if i == n_layers-2:
                 layers.append(nn.Linear(hidden_dim_beta, 1))
                 layers.append(nn.ReLU())
+                # layers.append(nn.Dropout(0.3))
             else:
                 layers.append(nn.Linear(hidden_dim_beta, hidden_dim_beta))
                 layers.append(nn.ReLU())
+                # layers.append(nn.Dropout(0.3))
 
         self.mask2 = nn.Sequential(*layers)
         
@@ -65,223 +72,6 @@ class NeuralGrad(nn.Module):
         msk = self.mask2(grad)
         x = p * grad + msk * grad * p
         return x
-
-
-class TransformerDecoderBlock(nn.Module):
-    def __init__(self, dim, num_heads):
-        super().__init__()
-        self.self_attn = nn.MultiheadAttention(dim, num_heads)
-        self.norm1 = nn.LayerNorm(dim)
-        self.norm2 = nn.LayerNorm(dim)
-        self.ffn = nn.Sequential(
-        nn.Linear(dim, 4 * dim),
-        nn.GELU(),
-        nn.Linear(4 * dim, dim)
-        )
-
-    def forward(self, x):
-        """
-        x: (seq_len, batch_size, dim)
-        """
-        # Self-attention (preserves shape)
-        attn_output, _ = self.self_attn(x, x, x)
-        x = self.norm1(x + attn_output) # Residual connection
-        # Feedforward network (preserves shape)
-        ffn_output = self.ffn(x)
-        x = self.norm2(x + ffn_output) # Residual connection
-        return x # Shape: (seq_len, batch_size, dim)
-
-class MemoryModule(nn.Module):
-    def __init__(self, memory_size, dim, num_heads=4):
-        super().__init__()
-        self.memory_size = memory_size
-        self.dim = dim
-        # Memory initialized as learnable parameters
-        self.memory = nn.Parameter(torch.zeros(memory_size, dim), requires_grad=True)
-
-    def read(self, query):
-        ## query: 1, dim x memory.T: dim, memory_size -> 1, ms
-        attn_weights = F.softmax(torch.matmul(query, self.memory.T), dim=-1)
-        return torch.matmul(attn_weights, self.memory) # 1, dim
-
-    def write(self, input_vector):
-        self.memory.data += input_vector.mean(dim=0).data.unsqueeze(0)
-
-
-class StatefulTransformerDecoder(nn.Module):
-    def __init__(self, dim=128, num_layers=2, num_heads=4, num_tokens=100, seq_len=10, memory_size=5):
-        super().__init__()
-        self.dim = dim
-        self.num_layers = num_layers
-        self.seq_len = seq_len
-
-        # Embedding layers
-        self.token_embedding = nn.Embedding(num_tokens, dim)
-        self.position_embedding = nn.Embedding(seq_len, dim)
-
-        # Transformer Decoder blocks
-        self.layers = nn.ModuleList([TransformerDecoderBlock(dim, num_heads) for _ in range(num_layers)])
-
-        # Memory module
-        self.memory_module = MemoryModule(memory_size, dim, num_heads)
-
-        # Output projection
-        self.norm = nn.LayerNorm(dim)
-        self.fc_out = nn.Linear(dim, num_tokens)
-
-    def forward(self, x):
-        """
-        x: (seq_len, batch_size)
-        """
-        seq_len = x.size(0)
-        batch_size = x.size(1)
-
-        # Get token embeddings
-        x = self.token_embedding(x) # Shape: (seq_len, batch_size, dim)
-
-        # Add positional embeddings
-        position_ids = torch.arange(seq_len, device=x.device).unsqueeze(1) # Shape: (seq_len, 1)
-        x = x + self.position_embedding(position_ids).expand_as(x) # Shape: (seq_len, batch_size, dim)
-
-        # Pass through Transformer layers
-        for layer in self.layers:
-            x = layer(x) # Shape: (seq_len, batch_size, dim)
-
-            # Memory interaction after each layer
-            memory_output = self.memory_module(x)
-            x = x + memory_output # Shape: (seq_len, batch_size, dim)
-
-        # Update memory using the mean of the current state
-        current_state = x.mean(dim=0) # Shape: (batch_size, dim)
-        self.memory_module.update_memory(current_state)
-
-        # Final normalization and projection
-        x = self.norm(x) # Shape: (seq_len, batch_size, dim)
-        logits = self.fc_out(x) # Shape: (seq_len, batch_size, num_tokens)
-
-        return logits
-
-
-class RecurrentMemory(nn.Module):
-    def __init__(self, memory_size, dim):
-        super(RecurrentMemory, self).__init__()
-        self.memory_size = memory_size
-        self.dim = dim
-
-        self.memory = nn.Parameter(torch.zeros(memory_size, dim), requires_grad=False)
-
-    
-    def forward(self, hidden_states):
-        '''
-        hidden_states: seq_len, batch_size, dim
-        '''
-        new_memory = torch.cat([self.memory, hidden_states], dim=0)
-        new_memory = new_memory[-self.memory_size:]
-        self.memory = nn.Parameter(new_memory.detach(), requires_grad=False)
-        return self.memory
-
-class RecurrentMemoryTransformerBlock(nn.Module):
-    def __init__(self, dim, num_heads, ff_dim):
-        super(RecurrentMemoryTransformerBlock, self).__init__()
-        self.self_attn = nn.MultiheadAttention(
-            embed_dim=dim,
-            num_heads=num_heads
-        )
-        self.norm1 = nn.LayerNorm(dim)
-        self.ff = nn.Sequential(
-            nn.Linear(dim, ff_dim),
-            nn.ReLU(),
-            nn.Linear(ff_dim, dim)
-        )
-        self.norm2 = nn.LayerNorm(dim)
-       
-    
-    def forward(self, x, memory):
-        '''
-        x: seq_len, batch_size, dim
-        memory: memory_size, batch_size, dim
-        '''
-        print(memory.shape, x.shape)
-        memory = memory.unsqueeze(1)
-        combined_input = torch.cat([memory, x], dim=0) # seq_len+memory_size, batch_size, dim
-
-        attn_output, _ = self.self_attn(combined_input, combined_input, combined_input)
-
-        attn_output = attn_output[-x.size(0):] # seq_len, batch_size, dim
-
-        x = x + attn_output
-        x = self.norm1(x)
-
-        ff_output = self.ff(x)
-
-        x = x + ff_output
-        x = self.norm2(x)
-
-        return x
-
-class RecurrentMemoryTransformer(nn.Module):
-    def __init__(self, num_tokens, dim, num_heads, ff_dim, num_layers, memory_size, seq_len):
-        super(RecurrentMemoryTransformer, self).__init__()
-        self.embedding = nn.Embedding(num_tokens, dim)
-        self.transformer_layer = nn.ModuleList([
-            nn.TransformerEncoderLayer(dim, num_heads) for _ in range(num_layers)
-        ])
-        self.memory_module = MemoryModule(memory_size,dim)
-        self.fc_out = nn.Linear(dim, num_tokens)
-    
-
-    def forward(self, x):
-        x = self.embedding(x) # seq_len, batch_size, dim
-
-        memory_state = torch.zeros(1, x.size(-1)).to(x.device) # 1, dim
-
-        for t in range(x.size(0)):
-            memory_read = self.memory_module.read(memory_state) # 1, dim
-
-            combined_input = x[t] + memory_read # batch, dim
-
-            for layer in self.transformer_layer:
-                combined_input = layer(combined_input.unsqueeze(0)).squeeze(0) # batch dim
-            
-            memory_state = combined_input
-            self.memory_module.write(combined_input)
-        
-        output = self.fc_out(combined_input)
-        return output
-
-
-class RecurrentTransformerBlock(nn.Module):
-    def __init__(self, dim, num_heads, ff_dim):
-        super(RecurrentTransformerBlock, self).__init__()
-        self.self_attn = nn.MultiheadAttention(
-            embed_dim=dim,
-            num_heads=num_heads
-        )
-        self.norm1 = nn.LayerNorm(dim)
-        self.ff = nn.Sequential(
-            nn.Linear(dim, ff_dim),
-            nn.ReLU(),
-            nn.Linear(ff_dim, dim)
-        )
-        self.norm2 = nn.LayerNorm(dim)
-    
-    def forward(self, x, memory):
-        combined_input = torch.cat([memory, x], dim=0)
-
-        attn_output, _ = self.self_attn(combined_input, combined_input, combined_input)
-
-        attn_output = attn_output[-x.size(0):]
-
-        x = x + attn_output
-        x = self.norm1(x)
-
-        ff_output = self.ff(x)
-
-        x = x + ff_output
-        x = self.norm2(x)
-
-        return x
-
 
 
 
@@ -480,7 +270,7 @@ class ab_mod_p_data(Dataset):
     
     def generate_data(self, p, eq_token, op_token1):
         """
-        (a*c+b*d-e) % p for 0 <= a, c < p, 0< b< p
+        (a*b) % p for 0 <= a < p, 0< b< p
         """
         a = torch.arange(p)
         b = torch.arange(1, p)
@@ -500,6 +290,63 @@ class ab_mod_p_data(Dataset):
 
     def __getitem__(self, idx):
         return self.data[:, idx]
+
+class a_plus_b_mod_p_data(Dataset):
+
+    def __init__(self, p, eq_token, op_token1):
+        self.data = self.generate_data(p, eq_token, op_token1)
+    
+    def generate_data(self, p, eq_token, op_token1):
+        """
+        (a*b) % p for 0 <= a < p, 0< b< p
+        """
+        a = torch.arange(p)
+        b = torch.arange(1, p)
+
+        a, b= torch.cartesian_prod(a, b).T
+
+        eq = torch.ones_like(a) * eq_token
+        op1 = torch.ones_like(a) * op_token1
+        result = (a + b) % p
+
+
+        return torch.stack([a, b, op1, eq, result])
+
+
+    def __len__(self):
+        return self.data.shape[1]
+
+    def __getitem__(self, idx):
+        return self.data[:, idx]
+    
+class a_minus_b_mod_p_data(Dataset):
+
+    def __init__(self, p, eq_token, op_token1):
+        self.data = self.generate_data(p, eq_token, op_token1)
+    
+    def generate_data(self, p, eq_token, op_token1):
+        """
+        (a*b) % p for 0 <= a < p, 0< b< p
+        """
+        a = torch.arange(p)
+        b = torch.arange(1, p)
+
+        a, b= torch.cartesian_prod(a, b).T
+
+        eq = torch.ones_like(a) * eq_token
+        op1 = torch.ones_like(a) * op_token1
+        result = (a - b) % p
+
+
+        return torch.stack([a, b, op1, eq, result])
+
+
+    def __len__(self):
+        return self.data.shape[1]
+
+    def __getitem__(self, idx):
+        return self.data[:, idx]
+
 
 class ComputationModDataset(Dataset):
 
@@ -539,7 +386,81 @@ class ComputationModDataset(Dataset):
 
     def __getitem__(self, idx):
         return self.data[:, idx]
+
+
+
+class MixSimpleDataset(Dataset):
+    def __init__(self, p, eq_token, op1, op2, op3):
+        self.data = self.generate_data(p, eq_token, op1, op2, op3)
     
+    def generate_data(self, p, eq, op1, op2, op3):
+        """
+        Simple Mix Dataset including:
+        1. (a + b) mod p
+        2. (a - b) mod p
+        3. (a * b) mod p
+
+        op1: +
+        op2: -
+        op3: *
+        """
+
+        a = torch.arange(p)
+        b = torch.arange(1, p)
+
+        a, b = torch.cartesian_prod(a, b).T
+
+        eq = torch.ones_like(a) * eq
+        op1 = torch.ones_like(a) * op1
+        res1 = (a + b) % p
+
+        op2 = torch.ones_like(a) * op2
+        res2 = (a - b) % p
+
+        op3 = torch.ones_like(a) * op3
+        res3 = (a * b) % p
+
+        d1 = torch.stack([a, b, op1, eq, res1])
+        d2 = torch.stack([a, b, op2, eq, res2])
+        d3 = torch.stack([a, b, op3, eq, res3])
+    
+        return torch.cat([d1, d2, d3], dim=1)
+    
+    def __len__(self):
+        return self.data.shape[1]
+
+    def __getitem__(self, idx):
+        return self.data[:, idx]
+    
+
+
+class MixHardDataset(Dataset):
+    def __init__(self,p, eq, op1, op2, op3):
+        self.data = self.generate_data(p, eq, op1, op2, op3)
+    
+    def generate_data(self, p, eq, op1, op2, op3):
+        """
+        Hard Mix Dataset including:
+        1. (a + b - c) mod p
+        2. (a * b + c) mod p
+        3. (a * b + c * b) mod p
+        4. (a - b + c) mod p
+        
+
+        op1: +
+        op2: -
+        op3: *
+        """
+        a = torch.arange(p)
+        b = torch.arange(1, p)
+
+
+
+
+    
+
+
+
 def main(args):
     torch.manual_seed(args.seed)
 
@@ -575,6 +496,21 @@ def main(args):
         beta=args.neural_beta,
     ).to(device)
 
+    if args.tl_eval:
+        ### load pretrained ckpt
+        ckpt_path = 'results/acc_(ab)mod_p_p=97_TD_2Layers_4Heads_128Dim_lr0.001_NeuralGrad_3NeuralLayers_16Alpha_32Beta_8InnerLoop.pt'
+        neural_grad.load_state_dict(torch.load(ckpt_path, weights_only=True))
+        neural_grad.eval()
+        print("************************LOADED***********************************")
+
+    # neural_grad = NG_MOE(
+    #     hidden_dim=args.neural_hidden_dim,
+    #     n_layers=args.neural_layers,
+    #     alpha=args.neural_alpha,
+    #     beta=args.neural_beta,
+    #     n_experts=4,
+    # ).to(device)
+
     # model = StatefulTransformerDecoder(
     #     dim=args.dim, num_layers=args.n_layers, num_heads=args.n_heads,
     #     num_tokens=args.p + 2,
@@ -599,11 +535,33 @@ def main(args):
 
     #data = multiplication_mod_p_data(args.p, eq_token, op_token)
     #dataset = ComputationModDataset(args.p, eq_token=eq_token, op_token=op_token, op_token2=op_token2)
-    #dataset = ab_sub_cb_mod_p_data(args.p, eq_token, op_token1, op_token2)
-    #dataset = ac_plus_bd_sub_e_mod_p_data(args.p, eq_token, op_token1, op_token2, op_token3)
-    dataset = ab_mod_p_data(args.p, eq_token, op_token1)
+
+    # dataset = ab_sub_cb_mod_p_data(args.p, eq_token, op_token1, op_token2)
+    # dataset_type = '(ab-cb)mod_p'
+
+    # dataset = ac_plus_bd_sub_e_mod_p_data(args.p, eq_token, op_token1, op_token2, op_token3)
+    # dataset_type = "(ac+bd-e)mod_p"
+    #dataset_type = "(ac+bd-e)mod_p_TransferTask"
+
+    # dataset = MixSimpleDataset(args.p, eq_token, op_token1, op_token2, op_token3)
+    # dataset_type = "MixSimpleData_p"
+
+    # dataset = ab_mod_p_data(args.p, eq_token, op_token1)
+    # dataset_type = "(ab)mod_p"
+    #dataset_type = '(ab)mod_p_TransferTask'
+    
+
+    dataset = a_minus_b_mod_p_data(args.p, eq_token, op_token1)
+    dataset_type = "(a-b)mod_p"
+
+    # dataset = a_plus_b_mod_p_data(args.p, eq_token, op_token1)
+    # dataset_type = '(a+b)mod_p_TransferFrom_(ab)mod97'
+
     #data = expression_mod_p_data(args.p, eq_token, op_token, op_token2)
-    print(len(dataset))
+    
+    
+    # print(len(dataset), dataset.data.shape, dataset.__getitem__(50))
+    # sys.exit(0)
 
     # train_size = data.shape[1] // 2
     # indices = torch.randperm(data.shape[1])
@@ -636,17 +594,18 @@ def main(args):
         ]
     )
 
-    meta_optimizer = getattr(torch.optim, args.optimizer)(
-        [
-            {
-                "params": neural_grad.parameters(),
-        "lr": 1e-4,
-        "weight_decay": args.weight_decay,
-        "betas":(args.beta1, args.beta2)
-        },
-    
-        ]
-    )
+    if not args.tl_eval:
+        meta_optimizer = getattr(torch.optim, args.optimizer)(
+            [
+                {
+                    "params": neural_grad.parameters(),
+            "lr": 1e-4,
+            "weight_decay": args.weight_decay,
+            "betas":(args.beta1, args.beta2)
+            },
+        
+            ]
+        )
 
     #  linear learning rate warmup over the first 10 updates
     scheduler = torch.optim.lr_scheduler.LambdaLR(
@@ -655,6 +614,7 @@ def main(args):
 
     #steps_per_epoch = math.ceil(train_data.shape[1] / args.batch_size)
     steps_per_epoch = len(train_loader)
+    print(steps_per_epoch, int(args.budget) // steps_per_epoch )
 
     its, train_acc, val_acc, train_loss, val_loss = [], [], [], [], []
     grads = None
@@ -726,10 +686,12 @@ def main(args):
                         
                         final_loss = F.cross_entropy(model(input[:-1])[-1], input[-1])
                         print(final_loss)
-                        meta_optimizer.zero_grad()
-                        final_loss.backward()
-                        meta_optimizer.step()
-                        
+
+                        if not args.tl_eval:
+                            meta_optimizer.zero_grad()
+                            final_loss.backward()
+                            meta_optimizer.step()
+                            
                         i += 1
                     
                     else:
@@ -822,46 +784,67 @@ def main(args):
         if args.save_weights:
             do_save = e <= 500 or (e > 500 and (e + 1) % 100 == 0) or e == int(args.budget) // steps_per_epoch - 1
         else:
-            do_save = (e + 1) % 100 == 0
+            do_save = (e + 1) % 10 == 0
+           
         if do_save:
             steps = torch.arange(len(train_acc)).numpy() * steps_per_epoch
+            print(steps[0], steps[-1])
+            print(len(steps), len(train_acc))
+
             plt.plot(steps, train_acc, label="train")
             plt.plot(steps, val_acc, label="val")
             plt.legend()
-            plt.title("Modular Multiplication (training on 50% of data)")
+            plt.title(f"{dataset_type}_p={args.p} (training on 50% of data)")
             plt.xlabel("Optimization Steps")
             plt.ylabel("Accuracy")
             plt.xscale("log", base=10)
             plt.grid()
-            plt.savefig(f"results/acc_{args.label}.png", dpi=150)
+            if args.neural_grad:
+                plt.savefig(f"results/acc_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_NeuralGrad_{args.neural_layers}NeuralLayers_{args.neural_alpha}Alpha_{args.neural_beta}Beta_{args.inner_steps}InnerLoop.png", dpi=150)
+                
+                if not args.tl_eval:
+                    torch.save(neural_grad.state_dict(), f"results/acc_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_NeuralGrad_{args.neural_layers}NeuralLayers_{args.neural_alpha}Alpha_{args.neural_beta}Beta_{args.inner_steps}InnerLoop.pt")
+            elif args.filter:
+                plt.savefig(f"results/acc_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_filter_{args.filter}.png", dpi=150)
+                #torch.save(neural_grad.state_dict(), f"results/acc_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_filter_{args.filter}.pt")
+            else:
+                plt.savefig(f"results/acc_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}.png", dpi=150)
             plt.close()
 
             plt.plot(steps, train_loss, label="train")
             plt.plot(steps, val_loss, label="val")
             plt.legend()
-            plt.title("Modular Multiplication (training on 50% of data)")
+            plt.title(f"{dataset_type}_p={args.p}_(training on 50% of data)")
             plt.xlabel("Optimization Steps")
             plt.ylabel("Loss")
             plt.xscale("log", base=10)
             plt.grid()
-            plt.savefig(f"results/loss_{args.label}.png", dpi=150)
+            if args.neural_grad:
+                plt.savefig(f"results/loss_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_NeuralGrad_{args.neural_layers}NeuralLayers_{args.neural_alpha}Alpha_{args.neural_beta}Beta_{args.inner_steps}InnerLoop.png", dpi=150)
+            elif args.filter:
+                plt.savefig(f"results/loss_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_filter_{args.filter}.png", dpi=150)
+            else:
+                plt.savefig(f"results/loss_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}.png", dpi=150)
+          
             plt.close()
 
-            results = {
-                'its': its,
-                'train_acc': train_acc,
-                'train_loss': train_loss,
-                'val_acc': val_acc,
-                'val_loss': val_loss,
-            }
 
-            if args.save_weights:
-                net_its.append(e)
-                nets.append(copy.deepcopy(model.state_dict()))
-                results['net_its'] = net_its
-                results['net'] = nets
 
-            torch.save(results, f"results/res_{args.label}.pt")
+            # results = {
+            #     'its': its,
+            #     'train_acc': train_acc,
+            #     'train_loss': train_loss,
+            #     'val_acc': val_acc,
+            #     'val_loss': val_loss,
+            # }
+
+            # if args.save_weights:
+            #     net_its.append(e)
+            #     nets.append(copy.deepcopy(model.state_dict()))
+            #     results['net_its'] = net_its
+            #     results['net'] = nets
+
+            # torch.save(results, f"results/res_{args.label}.pt")
 
 
 if __name__ == "__main__":
@@ -888,6 +871,7 @@ if __name__ == "__main__":
     parser.add_argument("--neural_alpha", type=int, default=16)
     parser.add_argument("--neural_beta",type=int, default=6)
     parser.add_argument("--neural_grad", action='store_true')
+    parser.add_argument("--tl_eval", action="store_true")
 
     # Grokfast
     parser.add_argument("--filter", type=str, choices=["none", "ma", "ema", "fir", "meta"], default="none")
