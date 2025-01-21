@@ -17,6 +17,8 @@ from utils import SVD_Decomp, Nuclear_Norm
 import wandb
 
 
+torch.autograd.set_detect_anomaly(True)
+
 class NeuralGrad_OneMLP(nn.Module):
     def __init__(self, hidden_dim=128, n_layers=2, alpha=16, beta=6):
         super(NeuralGrad_OneMLP,self).__init__()
@@ -30,6 +32,7 @@ class NeuralGrad_OneMLP(nn.Module):
 
         layers.append(nn.Linear(1, hidden_dim_alpha))
         layers.append(nn.ReLU())
+        
 
         for i in range(n_layers-1):
             if i == n_layers-2:
@@ -37,6 +40,7 @@ class NeuralGrad_OneMLP(nn.Module):
             else:
                 layers.append(nn.Linear(hidden_dim_alpha, hidden_dim_alpha))
                 layers.append(nn.ReLU())
+               
         
         self.mlp = nn.Sequential(*layers)
         
@@ -46,20 +50,79 @@ class NeuralGrad_OneMLP(nn.Module):
     def forward(self, grad):
         g1 = self.mlp(grad)
         p = self.softmax(g1)
-        x = p * grad
+        x = p * grad + grad
         return x
 
 
 
+# class NeuralGrad(nn.Module):
+#     def __init__(self, hidden_dim=32, n_layers=2, alpha=16, beta=6):
+#         super(NeuralGrad,self).__init__()
+
+#         self.alpha = alpha
+#         self.beta = beta
+
+#         hidden_dim_alpha = int(self.alpha * hidden_dim)
+#         hidden_dim_beta = int(self.beta * hidden_dim)
+
+#         layers = []
+
+#         layers.append(nn.Linear(1, hidden_dim_alpha))
+#         layers.append(nn.ReLU())
+       
+
+#         for i in range(n_layers-1):
+#             if i == n_layers-2:
+#                 layers.append(nn.Linear(hidden_dim_alpha, 1))
+#             else:
+#                 layers.append(nn.Linear(hidden_dim_alpha, hidden_dim_alpha))
+#                 layers.append(nn.ReLU())
+               
+        
+#         self.mlp = nn.Sequential(*layers)
+
+
+#         layers = []
+
+#         layers.append(nn.Linear(1, hidden_dim_beta))
+#         layers.append(nn.ReLU())
+
+      
+
+#         for i in range(n_layers-1):
+#             if i == n_layers-2:
+#                 layers.append(nn.Linear(hidden_dim_beta, 1))
+#                 layers.append(nn.ReLU())
+               
+#             else:
+#                 layers.append(nn.Linear(hidden_dim_beta, hidden_dim_beta))
+#                 layers.append(nn.ReLU())
+               
+
+#         self.mask2 = nn.Sequential(*layers)
+        
+#         self.softmax = nn.Softmax(dim=0)
+
+    
+#     def forward(self, grad):
+#         g1 = self.mlp(grad)
+#         p = self.softmax(g1)
+        
+#         # return p * grad
+
+#         msk = self.mask2(grad)
+#         x = p * grad + msk * grad * p  # + grad
+        
+#         return x
+
+
 class NeuralGrad(nn.Module):
-    def __init__(self, hidden_dim=32, n_layers=2, alpha=16, beta=6):
+    def __init__(self, hidden_dim=32, n_layers=2, alpha=16, beta=2):
         super(NeuralGrad,self).__init__()
 
         self.alpha = alpha
-        self.beta = beta
-
         hidden_dim_alpha = int(self.alpha * hidden_dim)
-        hidden_dim_beta = int(self.beta * hidden_dim)
+    
 
         layers = []
 
@@ -76,37 +139,55 @@ class NeuralGrad(nn.Module):
                
         
         self.mlp = nn.Sequential(*layers)
+        self.softmax = nn.Softmax(dim=0)
+        self.relu = nn.ReLU()
 
 
-        layers = []
 
-        layers.append(nn.Linear(1, hidden_dim_beta))
-        layers.append(nn.ReLU())
+        # self.beta = beta
+        # hidden_dim_beta = int(self.beta * hidden_dim)
+        # layers = []
+        # layers.append(nn.Linear(1, hidden_dim_beta))
+        # layers.append(nn.ReLU())
 
       
 
-        for i in range(n_layers-1):
-            if i == n_layers-2:
-                layers.append(nn.Linear(hidden_dim_beta, 1))
-                layers.append(nn.ReLU())
+        # for i in range(n_layers-1):
+        #     if i == n_layers-2:
+        #         layers.append(nn.Linear(hidden_dim_beta, 1))
+        #         layers.append(nn.ReLU())
                
-            else:
-                layers.append(nn.Linear(hidden_dim_beta, hidden_dim_beta))
-                layers.append(nn.ReLU())
+        #     else:
+        #         layers.append(nn.Linear(hidden_dim_beta, hidden_dim_beta))
+        #         layers.append(nn.ReLU())
                
 
-        self.mask2 = nn.Sequential(*layers)
-        
-        self.softmax = nn.Softmax(dim=-1)
+        # self.mask2 = nn.Sequential(*layers)
 
     
     def forward(self, grad):
-        g1 = self.mlp(grad)
-        p = self.softmax(g1)
-        # return p * grad
+        #grad = grad / torch.norm(grad)
 
-        msk = self.mask2(grad)
-        x = p * grad + msk * grad * p
+        mlp1 = self.mlp(grad)
+        g1 = mlp1 * grad # / torch.norm(mlp1 * grad)
+        # p = self.softmax(mlp1)
+        # g1 = p * grad / torch.norm(p * grad)
+        
+        # grad = grad.clone()
+        # ## best
+        # mlp2 = self.mask2(grad)
+        # g2 = mlp2 / torch.norm(mlp2)  + grad / torch.norm(grad)
+
+        # mlp2 = self.mask2(grad)
+        # g2 = mlp2 * g1 / torch.norm(mlp2 * g1)
+
+        # mlp2 = self.mask2(grad)
+        # g2 = mlp2 * grad / torch.norm(mlp2 * grad)
+
+      
+        
+        x =  g1 
+        
         return x
 
 
@@ -554,6 +635,21 @@ class MixHardDataset(Dataset):
         
 
 
+def new_requires_grad(model, is_required=True):
+    for name, module in model.named_modules():
+        if hasattr(module, "weight"):
+            module.weight.grad = None
+            module.weight.requires_grad = is_required
+        if hasattr(module, "bias"):
+            module.bias.grad = None
+            module.bias.requires_grad = is_required
+        if hasattr(module, "in_proj_weight"):
+            module.in_proj_weight.grad = None
+            module.in_proj_weight.requires_grad = is_required
+        if hasattr(module, "in_proj_bias"):
+            module.in_proj_bias.grad = None
+            module.in_proj_bias.requires_grad = is_required
+
 
 
     
@@ -610,13 +706,36 @@ def main(args):
     # ).to(device)
 
     if args.tl_eval:
-        ### load pretrained ckpt for transfer learning experiments
+        ### load pretrained ckpt
         ckpt_path = 'results/acc_(ab-cb)mod_p_p=23_AuxLoss_False_TD_2Layers_4Heads_128Dim_lr0.001_NeuralGrad_2NeuralLayers_24Alpha_24Beta_10InnerLoop.pt'
         neural_grad.load_state_dict(torch.load(ckpt_path, weights_only=True))
         neural_grad.eval()
         print("************************LOADED***********************************")
 
- 
+    # neural_grad = NG_MOE(
+    #     hidden_dim=args.neural_hidden_dim,
+    #     n_layers=args.neural_layers,
+    #     alpha=args.neural_alpha,
+    #     beta=args.neural_beta,
+    #     n_experts=4,
+    # ).to(device)
+
+    # model = StatefulTransformerDecoder(
+    #     dim=args.dim, num_layers=args.n_layers, num_heads=args.n_heads,
+    #     num_tokens=args.p + 2,
+    #     seq_len= args.seq_len,
+    #     memory_size=16
+    # ).to(device)
+
+    # model = RecurrentMemoryTransformer(
+    #     num_tokens=args.p+2,
+    #     dim=args.dim,
+    #     num_heads=args.n_heads,
+    #     ff_dim=int(args.dim*4),
+    #     num_layers=args.n_layers,
+    #     memory_size=args.memory_size,
+    #     seq_len=args.seq_len
+    # ).to(device)
 
     nparams = sum([p.numel() for p in model.parameters() if p.requires_grad])
     print(model)
@@ -628,7 +747,7 @@ def main(args):
 
     # dataset = ab_sub_cb_mod_p_data(args.p, eq_token, op_token1, op_token2)
     # # dataset_type = '(ab-cb)mod_p'
-    # dataset_type = 'Transfer_(a+b)mod_97_to_(ab-cb)mod_p'
+    # dataset_type = 'Transfer_(ac+bd-e)mod7_to_(ab-cb)mod_p'
 
     # dataset = aa_sub_b_mod_p_data(args.p, eq_token, op_token1, op_token2)
     # dataset_type = "(aa-b)mod_p"
@@ -636,26 +755,26 @@ def main(args):
 
     # dataset = ac_plus_bd_sub_e_mod_p_data(args.p, eq_token, op_token1, op_token2, op_token3)
     # # dataset_type = "(ac+bd-e)mod_p"
-    # dataset_type = "Transfer_(ab-cb)mod_23_to_(ac+bd-e)mod_p"
+    # dataset_type = "Transfer_(ab)mod97_to_(ac+bd-e)mod_p"
 
     # dataset = MixSimpleDataset(args.p, eq_token, op_token1, op_token2, op_token3)
     # # dataset_type = "MixSimpleData_p"
     # dataset_type = 'Transfer_(ab)mod_97_to_MixSimpleData_p'
 
-    dataset = ab_mod_p_data(args.p, eq_token, op_token1)
-    dataset_type = "(ab)mod_p"
-    # dataset_type = 'Transfer_(a-b)mod_97_to_(ab)mod_p'
+    # dataset = ab_mod_p_data(args.p, eq_token, op_token1)
+    # # dataset_type = "Transfer_(ac+bd-e)mod7_to_(ab)mod_p"
+    # dataset_type = 'Transfer_(ac+bd-e)mod7_to_(ab)mod_p'
     
     # dataset = a_plus_b_minus_ab_mod_p_data(args.p, eq_token, op_token1, op_token2, op_token3)
     # dataset_type = "(a+b-ab)mod_p"
 
     # dataset = a_minus_b_mod_p_data(args.p, eq_token, op_token1)
-    # dataset_type = "(a-b)mod_p"
-    # dataset_type = "Transfer_(a+b)mod_97_to_(a-b)mod_p"
+    # # dataset_type = "(a-b)mod_p"
+    # dataset_type = "Transfer_(ab-cb)mod23_to_(a-b)mod_p"
 
-    # dataset = a_plus_b_mod_p_data(args.p, eq_token, op_token1)
-    # dataset_type = '(a+b)mod_p'
-    # dataset_type = "Transfer_(ab)mod_97_to_(a+b)mod_p"
+    dataset = a_plus_b_mod_p_data(args.p, eq_token, op_token1)
+    dataset_type = '(a+b)mod_p'
+    # dataset_type = "Transfer_(ac+bd-e)mod7_to_(a+b)mod_p"
 
     #data = expression_mod_p_data(args.p, eq_token, op_token, op_token2)
     
@@ -670,8 +789,9 @@ def main(args):
 
     train_size = int(0.5 * len(dataset))
     if args.aux_loss:
-        train_size = int(0.45 * len(dataset))
-        valid_size = int(0.05 * len(dataset))
+        train_size = int(0.49 * len(dataset))
+        valid_size = int(0.01 * len(dataset))
+        print("VALID SIZE: ", valid_size)
     else:
         
         valid_size = int(0 * len(dataset))
@@ -693,6 +813,14 @@ def main(args):
 
     # For most experiments we used AdamW optimizer with learning rate 10−3,
     # weight decay 1, β1 = 0.9, β2 = 0.98
+
+    adam_state = {}
+
+    lr = args.lr
+    betas = (0.9, 0.98)
+    eps = 1e-6
+
+
     optimizer = getattr(torch.optim, args.optimizer)(
         [
             {
@@ -735,6 +863,8 @@ def main(args):
     gradients_before = {name: [] for name, param in model.named_parameters() if "layers" in name}
     gradients_after = {name: [] for name, param in model.named_parameters() if "layers" in name}
 
+    h_t = []
+
     grads = None
     i = 0
 
@@ -756,36 +886,87 @@ def main(args):
             # dl = torch.split(data, args.batch_size, dim=1)
             # for input in dl:
             #     input = input.to(device)
-            for input in loader:
+            for idx, input in enumerate(loader):
                 input = input.to(device).long().transpose(0,1)
-                  # Debugging prints
-                # print(f"Input shape: {input.shape}")
-                # print(f"Input values: {input}")
-                # print(f"Max index: {input.max().item()}, Min index: {input.min().item()}")
-                # sys.exit(0)
+        
                 if is_train:
 
                     if args.neural_grad:
                         
                         cur_innerloop_attn_out_proj_grads_before, cur_innerloop_attn_out_proj_grads_after = [], []
 
-
-                        ## Inner Loop
                         for inner_step_idx in range(inner_steps):
 
                             with torch.set_grad_enabled(is_train):
                                 logits = model(input[:-1])
-                                # calculate loss only on the answer part of the equation (last element)
+                                # calculate loss only on the answer part of the equation (last element
                                 loss = F.cross_entropy(logits[-1], input[-1])
                                 total_loss += loss.item() * input.shape[-1]
                             
                             model.zero_grad()
-                            loss.backward() 
+                            loss.backward()
 
+                            # for name, module in model.named_modules():
+                            #     if hasattr(module, "weight") and module.weight is not None:
+
+                            #         if name not in adam_state:
+                            #             adam_state[name] = {
+                            #                 "weight":{"m": torch.zeros_like(module.weight), "v": torch.zeros_like(module.weight), "t":0},
+                            #                 "bias":{
+                            #                     "m": torch.zeros_like(module.bias) if (hasattr(module, 'bias') and module.bias is not None) else None,
+                            #                     "v": torch.zeros_like(module.bias) if (hasattr(module, 'bias') and module.bias is not None) else None,
+                            #                     "t":0
+                            #                 }
+                            #             }
+
+                            #             grad = module.weight.grad.view(-1,1)
+                            #             modified_grad = neural_grad(grad.data).view(module.weight.shape)
+
+                            #             state = adam_state[name]['weight']
+                            #             state['t'] += 1
+
+                            #             ## updating moving average
+                            #             state['m'] = betas[0] * state['m'] + (1 - betas[0]) * modified_grad
+                            #             state["v"] = betas[1] * state["v"] + (1 - betas[1]) * modified_grad ** 2
+
+                            #             ## compute bias-corrected moving average
+                            #             m_hat = state['m'] / (1 - betas[0] ** state['t'])
+                            #             v_hat = state['v'] / (1 - betas[1] ** state['t'])
+
+
+                            #             ## update module
+                            #             module.weight.data = module.weight.data - lr * m_hat / (torch.sqrt(v_hat + eps))
+                                        
+                                
+                            #     if hasattr(module, 'bias') and module.bias is not None:
+
+                                    
+                            #         grad = module.bias.grad.view(-1,1)
+                            #         modified_grad = neural_grad(grad.data).view(module.bias.shape)
+
+                            #         state = adam_state[name]['bias']
+                            #         state['t'] += 1
+
+                            #         ## updating moving average
+                            #         state['m'] = betas[0] * state['m'] + (1 - betas[0]) * modified_grad
+                            #         state['v'] = betas[1] * state['v'] + (1 - betas[1]) * modified_grad ** 2
+
+                            #         ## computing bias-corrected moving average
+                            #         m_hat = state['m'] / (1 - betas[0] ** state['t'])
+                            #         v_hat = state['v'] / (1 - betas[1] ** state['t'])
+
+                            #         module.bias.data =  module.bias.data - lr * m_hat / (torch.sqrt(v_hat + eps))
+
+                            # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+                            
+                            
+                            ######## Previoous
                             for name, param in model.named_parameters():
                                 # print(name, param, param.grad)
                                 grad = param.grad.view(-1,1)
-                                modified_grad = neural_grad(grad) ## Modified the param.grad
+                                modified_grad = neural_grad(grad)
+                                
+                                #print("inner_step_idx: ", inner_step_idx ,modified_grad.norm(p=2), grad.norm(p=2))
                                 param.grad = modified_grad.view(param.shape)
 
                                 ## track the gradients and compute the ratio
@@ -801,40 +982,263 @@ def main(args):
                                         #     cur_innerloop_attn_out_proj_grads_after.append(
                                         #         modified_grad.norm(p=2).item()
                                         #     )
+                                
+                                if args.fft:
+                                    if inner_step_idx == inner_steps - 1 and "layers.1.mlp.2.weight" in name:
+                                        #h_t.append((modified_grad).norm(p=2).item())
+                                        
+                                        h_t.append(((modified_grad - grad))[100].item())
+                                    
                                       
                                 
                             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 
                             optimizer.step()
-                            scheduler.step()
-                        
-                        final_loss = F.cross_entropy(model(input[:-1])[-1], input[-1])
-                        #print(final_loss)
-
-
-                        if args.aux_loss:
-                            val_loss = 0
-                            for val_input in valid_loader:
-                                val_input = val_input.to(device).long().transpose(0,1)
-                                val_logits = model(val_input[:-1])
-                                val_loss += F.cross_entropy(val_logits[-1], val_input[-1])
+                            ############ Previous
                             
-                            val_loss /= len(valid_loader)
                     
-                            final_loss = torch.abs(final_loss - val_loss) + final_loss
+
+                            scheduler.step()
+
                         
-                        print(final_loss)
+                        ## Outer loop: to use the val_loss to optimize the neural_grad
+                        if args.aux_loss:
+
+                            model_copy = copy.deepcopy(model)
+                            adam_state_copy = adam_state.copy()
+
+                            T=1
+
+                            for i in range(T):
+                                # if i > 0:
+                                #     new_requires_grad(model_copy, True)
+
+                                # if i==1:
+                                #     print(model_copy.token_embeddings.weight.grad_fn, model_copy.token_embeddings.weight.grad)
+                                #     exit()
+
+                                model_copy.zero_grad()
+                                neural_grad.zero_grad()
+
+                                ## compute the validation loss
+                                val_loss = 0
+                                for val_input in valid_loader:
+                                    val_input = val_input.to(device).long().transpose(0,1)
+                                    val_logits = model_copy(val_input[:-1])
+                                    val_loss += F.cross_entropy(val_logits[-1], val_input[-1])
+                                
+                                val_loss /= len(valid_loader)
+                                
+                                
+                                ## precompute the loss to get original gradient
+                                val_loss.backward(retain_graph=False)
+
+                        
+                                ## modify the gradients via neural grad
+                                for name, module in model_copy.named_modules():
+                                    # print(name, module)
+
+                                    # grad = param.grad.view(-1,1)
+                                    # modified_grad = neural_grad(grad)
+
+                                    if hasattr(module, "weight"):
+                                        grad = module.weight.grad.view(-1,1)
+                                        
+                                        modified_grad = neural_grad(grad).view(module.weight.shape)
+                                        # print(modified_grad)
+                                        w = module.weight.data
+                                        ## first delete
+                                        del module.weight
+                                        
+                                        # ################
+                                        # ## then re-write to keep grad_fn
+                                        # state = adam_state_copy[name]['weight']
+                                        # state['t'] += 1
+
+                                        # ## updating moving average
+                                        # state['m'] = betas[0] * state['m'] + (1 - betas[0]) * modified_grad
+                                        # state["v"] = betas[1] * state["v"] + (1 - betas[1]) * modified_grad ** 2
+
+                                        # ## compute bias-corrected moving average
+                                        # m_hat = state['m'] / (1 - betas[0] ** state['t'])
+                                        # v_hat = state['v'] / (1 - betas[1] ** state['t'])
+
+                                    
 
 
-                        if not args.tl_eval:
-                            meta_optimizer.zero_grad()
-                            final_loss.backward() ## NOTE: after the backward, the gradients only backward to the model, not the neural_grad
+                                        # ## update module
+                                        # module.weight = w - lr * m_hat / (torch.sqrt(v_hat + eps))
+                                        # ######################
 
-                            ## YOU CAN: check the gradients in neural_grad
-                            # for name, param in neural_grad.named_parameters():
-                            #     print(name, param, param.grad) --> EXPECTED: None
+                                        module.weight = w - args.lr * modified_grad.view(w.shape)
+                                        # module.weight.requires_grad = True
+                                        # print(module.weight)
 
-                            meta_optimizer.step()
+                                    if hasattr(module, "bias") and module.bias is not None:
+                                        grad = module.bias.grad.view(-1,1)
+                                        modified_grad = neural_grad(grad).view(module.bias.shape)
+                
+
+
+                                        b = module.bias.data
+                                    
+                                        ## first delete
+                                        del module.bias
+                                        ## then re-wite
+                                        
+                                        # #####################
+                                        # state = adam_state_copy[name]['bias']
+                                        # state['t'] += 1
+
+                                        # ## updating moving average
+                                        # state['m'] = betas[0] * state['m'] + (1 - betas[0]) * modified_grad
+                                        # state['v'] = betas[1] * state['v'] + (1 - betas[1]) * modified_grad ** 2
+
+                                        # ## computing bias-corrected moving average
+                                        # m_hat = state['m'] / (1 - betas[0] ** state['t'])
+                                        # v_hat = state['v'] / (1 - betas[1] ** state['t'])
+
+                                        # module.bias =  b - lr * m_hat / (torch.sqrt(v_hat + eps))
+                                        # #print(module.bias.shape)
+                                        # ############################
+
+
+                                        module.bias = b - args.lr* modified_grad.view(b.shape)
+                                    
+                                    if hasattr(module, "in_proj_weight"):
+                                        grad = module.in_proj_weight.grad.view(-1,1)
+                                        
+                                        modified_grad = neural_grad(grad).view(module.in_proj_weight.shape)
+                                        # print(modified_grad)
+                                        w = module.in_proj_weight.data
+                                        ## first delete
+                                        del module.in_proj_weight
+                                        
+                                        # ################
+                                        # ## then re-write to keep grad_fn
+                                        # state = adam_state_copy[name]['weight']
+                                        # state['t'] += 1
+
+                                        # ## updating moving average
+                                        # state['m'] = betas[0] * state['m'] + (1 - betas[0]) * modified_grad
+                                        # state["v"] = betas[1] * state["v"] + (1 - betas[1]) * modified_grad ** 2
+
+                                        # ## compute bias-corrected moving average
+                                        # m_hat = state['m'] / (1 - betas[0] ** state['t'])
+                                        # v_hat = state['v'] / (1 - betas[1] ** state['t'])
+
+                                    
+
+
+                                        # ## update module
+                                        # module.weight = w - lr * m_hat / (torch.sqrt(v_hat + eps))
+                                        # ######################
+
+                                        module.in_proj_weight = w - args.lr * modified_grad.view(w.shape)
+                                        # module.weight.requires_grad = True
+                                        # print(module.weight)
+
+                                    
+                                    if hasattr(module, "in_proj_bias"):
+                                        grad = module.in_proj_bias.grad.view(-1,1)
+                                        
+                                        modified_grad = neural_grad(grad).view(module.in_proj_bias.shape)
+                                        # print(modified_grad)
+                                        w = module.in_proj_bias.data
+                                        ## first delete
+                                        del module.in_proj_bias
+                                        
+                                        # ################
+                                        # ## then re-write to keep grad_fn
+                                        # state = adam_state_copy[name]['weight']
+                                        # state['t'] += 1
+
+                                        # ## updating moving average
+                                        # state['m'] = betas[0] * state['m'] + (1 - betas[0]) * modified_grad
+                                        # state["v"] = betas[1] * state["v"] + (1 - betas[1]) * modified_grad ** 2
+
+                                        # ## compute bias-corrected moving average
+                                        # m_hat = state['m'] / (1 - betas[0] ** state['t'])
+                                        # v_hat = state['v'] / (1 - betas[1] ** state['t'])
+
+                                    
+
+
+                                        # ## update module
+                                        # module.weight = w - lr * m_hat / (torch.sqrt(v_hat + eps))
+                                        # ######################
+
+                                        module.in_proj_bias = w - args.lr * modified_grad.view(w.shape)
+                                    
+                                        # module.weight.requires_grad = True
+                                        # print(module.weight)
+
+                                    # print(model)
+                                    # print(model.token_embeddings.weight)
+                                    # exit(0)
+                                    # print(help(model_copy))
+                                    # print(name, param)
+                                    
+                                    # del model_copy._modules[name]
+                                    # model_copy._modules[name] = param.data - args.lr* modified_grad.view(param.shape)
+                                    # print(name)
+                                    # print(model.token_embeddings.weight)
+                                    # exit(0)
+                                    # print(model_copy.named_parameters()[name])
+                                    # sys.exit()
+                                    ## update the param.weight
+                                    # param.data = param.data - args.lr* modified_grad.view(param.shape)
+                                
+                                # new_requires_grad(model_copy, False)
+                                # model_copy.eval()
+
+                                final_loss = 0
+                                for val_input in valid_loader:
+                                    val_input = val_input.to(device).long().transpose(0,1)
+                                    val_logits = model_copy(val_input[:-1])
+                                    final_loss += F.cross_entropy(val_logits[-1], val_input[-1])
+                                
+                                final_loss /= len(valid_loader)
+                                #final_loss = torch.abs(final_loss - loss.item())
+
+                                print(final_loss)
+                                
+
+
+                                # if args.aux_loss:
+                                #     val_loss = 0
+                                #     for val_input in valid_loader:
+                                #         val_input = val_input.to(device).long().transpose(0,1)
+                                #         val_logits = model(val_input[:-1])
+                                #         val_loss += F.cross_entropy(val_logits[-1], val_input[-1])
+                                    
+                                #     val_loss /= len(valid_loader)
+                            
+                                #     final_loss = torch.abs(final_loss - val_loss) + final_loss
+                                
+                                # print(final_loss)
+
+
+                                if not args.tl_eval:
+                                    meta_optimizer.zero_grad(set_to_none=True)
+                                    final_loss.backward(retain_graph=True)
+                                    
+                                    # neuralgrad_grad = torch.autograd.grad(
+                                    #     final_loss,
+                                    #     neural_grad.parameters(),
+                                    #     create_graph=True,
+                                    #     allow_unused=True,
+                                    # )
+
+                                    # print(neuralgrad_grad)
+
+
+                                    # for name, param in neural_grad.named_parameters():
+                                    #     print(param.grad)
+                                    
+                                    # sys.exit()
+
+                                    meta_optimizer.step()
                             
                         i += 1
 
@@ -850,58 +1254,77 @@ def main(args):
                        
                         cur_innerloop_attn_out_proj_grads_before = []
 
-                        with torch.set_grad_enabled(is_train):
-                            logits = model(input[:-1])
-                            # calculate loss only on the answer part of the equation (last element
-                            loss = F.cross_entropy(logits[-1], input[-1])
-                            total_loss += loss.item() * input.shape[-1]
+                        if idx == -1:
+                            loops = 10
+                        else:
+                            loops = 1
                         
-                        model.zero_grad()
-                        loss.backward()
-                        
-                        if args.track_grad:
+                        for i in range(loops):
+
+                            with torch.set_grad_enabled(is_train):
+                                logits = model(input[:-1])
+                                # calculate loss only on the answer part of the equation (last element
+                                loss = F.cross_entropy(logits[-1], input[-1])
+                                total_loss += loss.item() * input.shape[-1]
+                            
+                            model.zero_grad()
+                            loss.backward()
+
                             for name, param in model.named_parameters():
-                                    # print(name, param, param.grad)
-                                    grad = param.grad.view(-1,1)
-                                    ## track the gradients and compute the ratio
-                                    if  "layers" in name:
-                                        gradients_before[name].append(grad.norm(p=2).item())
-                                        
-                                        # if f"layers.{args.n_layers-1}.attn.out_proj.weight" in name:
-                                        #     cur_innerloop_attn_out_proj_grads_before.append(
-                                        #         grad.norm(p=2).item()
-                                        #     )
-                                
-
-                        
-
-                        #######
-
-                        trigger = i < 500 if args.two_stage else False
-
-                        if args.filter == "none":
-                            pass
-                        elif args.filter == "ma":
-                            grads = gradfilter_ma(model, grads=grads, window_size=args.window_size, lamb=args.lamb, trigger=trigger)
+                                grad_average = torch.mean(param.grad.data)
+                                param_norm = param.grad.data.norm(2).item()
+                                param.grad = (param.grad.data * 2) 
                             
                             if args.track_grad:
                                 for name, param in model.named_parameters():
-                                    # print(name, param, param.grad)
-                                    grad = param.grad.view(-1,1)
-                                    ## track the gradients and compute the ratio
-                                    if "layers" in name:
-                                        gradients_after[name].append(grad.norm(p=2).item())
+                                        # print(name, param, param.grad)
+                                        grad = param.grad.view(-1,1)
+                                        ## track the gradients and compute the ratio
+                                        if  "layers" in name:
+                                            gradients_before[name].append(grad.norm(p=2).item())
+                                            
+                                            # if f"layers.{args.n_layers-1}.attn.out_proj.weight" in name:
+                                            #     cur_innerloop_attn_out_proj_grads_before.append(
+                                            #         grad.norm(p=2).item()
+                                            #     )
+                                    
 
-                        elif args.filter == "ema":
-                            grads = gradfilter_ema(model, grads=grads, alpha=args.alpha, lamb=args.lamb)
-                        else:
-                            raise ValueError(f"Invalid gradient filter type `{args.filter}`")
+                            if args.fft:
+                                for name, param in model.named_parameters():
+                                        # print(name, param, param.grad)
+                                        grad = param.grad.view(-1,1)
+                                        if  "layers.1.mlp.2.weight" in name:
+                                            #h_t.append((grad)[100].item())
+                                            h_t.append(grad[200].item())
+                                            #h_t.append(1)
 
-                        #######
+                            #######
 
-                        optimizer.step()
-                        scheduler.step()
-            
+                            trigger = i < 500 if args.two_stage else False
+
+                            if args.filter == "none":
+                                pass
+                            elif args.filter == "ma":
+                                grads, h_t = gradfilter_ma(model, grads=grads, window_size=args.window_size, lamb=args.lamb, trigger=trigger, fft=args.fft, h_t=h_t)
+                                
+                                if args.track_grad:
+                                    for name, param in model.named_parameters():
+                                        # print(name, param, param.grad)
+                                        grad = param.grad.view(-1,1)
+                                        ## track the gradients and compute the ratio
+                                        if "layers" in name:
+                                            gradients_after[name].append(grad.norm(p=2).item())
+
+                            elif args.filter == "ema":
+                                grads = gradfilter_ema(model, grads=grads, alpha=args.alpha, lamb=args.lamb)
+                            else:
+                                raise ValueError(f"Invalid gradient filter type `{args.filter}`")
+
+                            #######
+
+                            optimizer.step()
+                            scheduler.step()
+                
                         i += 1
 
                         # if args.track_grad:
@@ -1032,7 +1455,7 @@ def main(args):
                     for ax in axes[n_params:]:
                         ax.axis("off")
                     
-                    plt.savefig(f"results/grad_norm_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_NeuralGrad_{args.neural_layers}NeuralLayers_{args.neural_alpha}Alpha_{args.neural_beta}Beta_{args.inner_steps}InnerLoop.png", dpi=250)
+                    plt.savefig(f"results_new/grad_norm_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_NeuralGrad_{args.neural_layers}NeuralLayers_{args.neural_alpha}Alpha_{args.neural_beta}Beta_{args.inner_steps}InnerLoop.png", dpi=250)
                     plt.close()
 
                 else:
@@ -1055,8 +1478,25 @@ def main(args):
                     for ax in axes[n_params:]:
                         ax.axis("off")
                     
-                    plt.savefig(f"results/grad_norm_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_filter_{args.filter}.png", dpi=250)
+                    plt.savefig(f"results_new/grad_norm_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_filter_{args.filter}.png", dpi=250)
                     plt.close()
+
+            if args.fft:
+                h_t2 = np.array(h_t)
+                freq_domain = np.fft.fft(h_t2)
+                freqs = np.fft.fftfreq(len(h_t2))
+                # print(freqs)
+
+                plt.plot(freqs[:len(freqs)//2], np.abs(freq_domain)[:len(freq_domain)//2])
+
+                plt.title("Frequency domain", fontsize=16)
+                plt.xlabel("Frequency", fontsize=14)
+                plt.ylabel("Amplitude", fontsize=14)
+                plt.tight_layout()
+                plt.grid()
+                #plt.savefig("frequency_domain_vanilla_training_originalgrad_dim200.png", dpi=250)
+                plt.savefig("frequency_domain_NeuralGrad_training_addedgrad_dim100.png", dpi=250)
+                plt.close()
 
                 # plt.plot(lastlayer_attn_out_proj_grad_before, label="out_proj_grad_before")
                 # if args.neural_grad:
@@ -1118,6 +1558,7 @@ if __name__ == "__main__":
     parser.add_argument("--tl_eval", action="store_true")
     parser.add_argument("--aux_loss", action="store_true")
     parser.add_argument("--track_grad", action="store_true")
+    parser.add_argument("--fft", action="store_true")
 
     # Grokfast
     parser.add_argument("--filter", type=str, choices=["none", "ma", "ema", "fir", "meta"], default="none")
