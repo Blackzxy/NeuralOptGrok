@@ -19,101 +19,7 @@ import wandb
 
 torch.autograd.set_detect_anomaly(True)
 
-class NeuralGrad_OneMLP(nn.Module):
-    def __init__(self, hidden_dim=128, n_layers=2, alpha=16, beta=6):
-        super(NeuralGrad_OneMLP,self).__init__()
 
-        self.alpha = alpha
-        self.beta = beta
-
-        hidden_dim_alpha = int(self.alpha * hidden_dim)
-
-        layers = []
-
-        layers.append(nn.Linear(1, hidden_dim_alpha))
-        layers.append(nn.ReLU())
-        
-
-        for i in range(n_layers-1):
-            if i == n_layers-2:
-                layers.append(nn.Linear(hidden_dim_alpha, 1))
-            else:
-                layers.append(nn.Linear(hidden_dim_alpha, hidden_dim_alpha))
-                layers.append(nn.ReLU())
-               
-        
-        self.mlp = nn.Sequential(*layers)
-        
-        self.softmax = nn.Softmax(dim=-1)
-
-    
-    def forward(self, grad):
-        g1 = self.mlp(grad)
-        p = self.softmax(g1)
-        x = p * grad + grad
-        return x
-
-
-
-# class NeuralGrad(nn.Module):
-#     def __init__(self, hidden_dim=32, n_layers=2, alpha=16, beta=6):
-#         super(NeuralGrad,self).__init__()
-
-#         self.alpha = alpha
-#         self.beta = beta
-
-#         hidden_dim_alpha = int(self.alpha * hidden_dim)
-#         hidden_dim_beta = int(self.beta * hidden_dim)
-
-#         layers = []
-
-#         layers.append(nn.Linear(1, hidden_dim_alpha))
-#         layers.append(nn.ReLU())
-       
-
-#         for i in range(n_layers-1):
-#             if i == n_layers-2:
-#                 layers.append(nn.Linear(hidden_dim_alpha, 1))
-#             else:
-#                 layers.append(nn.Linear(hidden_dim_alpha, hidden_dim_alpha))
-#                 layers.append(nn.ReLU())
-               
-        
-#         self.mlp = nn.Sequential(*layers)
-
-
-#         layers = []
-
-#         layers.append(nn.Linear(1, hidden_dim_beta))
-#         layers.append(nn.ReLU())
-
-      
-
-#         for i in range(n_layers-1):
-#             if i == n_layers-2:
-#                 layers.append(nn.Linear(hidden_dim_beta, 1))
-#                 layers.append(nn.ReLU())
-               
-#             else:
-#                 layers.append(nn.Linear(hidden_dim_beta, hidden_dim_beta))
-#                 layers.append(nn.ReLU())
-               
-
-#         self.mask2 = nn.Sequential(*layers)
-        
-#         self.softmax = nn.Softmax(dim=0)
-
-    
-#     def forward(self, grad):
-#         g1 = self.mlp(grad)
-#         p = self.softmax(g1)
-        
-#         # return p * grad
-
-#         msk = self.mask2(grad)
-#         x = p * grad + msk * grad * p  # + grad
-        
-#         return x
 
 
 class NeuralGrad(nn.Module):
@@ -123,7 +29,6 @@ class NeuralGrad(nn.Module):
         self.alpha = alpha
         hidden_dim_alpha = int(self.alpha * hidden_dim)
 
-        self.c = 1/1
 
         layers = []
 
@@ -153,7 +58,7 @@ class NeuralGrad(nn.Module):
         #g1 = mlp1 * grad / torch.norm(grad)  # / torch.norm(mlp1 * grad)
         p = self.softmax(mlp1)
        
-        g1 = self.c * p * grad / torch.norm(p * grad)
+        g1 = p * grad / torch.norm(p * grad)
         
         
         x =  g1 
@@ -227,37 +132,6 @@ class Decoder(nn.Module):
         # print("Logit: ", logits.shape)
         # sys.exit(0)
         return logits 
-
-
-
-class ab_sub_cb_mod_p_data(Dataset):
-
-    def __init__(self, p, eq_token, op_token1, op_token2):
-        self.data = self.generate_data(p, eq_token, op_token1, op_token2)
-    
-    def generate_data(self, p, eq_token, op_token1, op_token2):
-        """
-        (a*b-c*b) % p for 0 <= a, c < p, 0< b< p
-        """
-        a = torch.arange(p)
-        b = torch.arange(1,p)
-        c = torch.arange(p)
-        a, b, c = torch.cartesian_prod(a, b, c).T
-
-        eq = torch.ones_like(a) * eq_token
-        op1 = torch.ones_like(a) * op_token1
-        op2 = torch.ones_like(a) * op_token2
-        result = (a * b - c * b) % p
-
-
-        return torch.stack([a, b, c, op1, op2, eq, result])
-
-
-    def __len__(self):
-        return self.data.shape[1]
-
-    def __getitem__(self, idx):
-        return self.data[:, idx]
 
 
 class aa_sub_b_mod_p_data(Dataset):
@@ -348,35 +222,6 @@ class ab_mod_p_data(Dataset):
     def __getitem__(self, idx):
         return self.data[:, idx]
 
-class a_plus_b_minus_ab_mod_p_data(Dataset):
-
-    def __init__(self, p, eq_token, op_token1, op_token2, op_token3):
-        self.data = self.generate_data(p, eq_token, op_token1, op_token2, op_token3)
-    
-    def generate_data(self, p, eq_token, op_token1, op_token2, op_token3):
-        """
-        (a*b) % p for 0 <= a < p, 0< b< p
-        """
-        a = torch.arange(p)
-        b = torch.arange(1, p)
-
-        a, b= torch.cartesian_prod(a, b).T
-
-        eq = torch.ones_like(a) * eq_token
-        op1 = torch.ones_like(a) * op_token1
-        op2 = torch.ones_like(a) * op_token2
-        op3 = torch.ones_like(a) * op_token3
-        result = (a + b - a * b) % p
-
-
-        return torch.stack([a, b, op1, op2, op3, eq, result])
-
-
-    def __len__(self):
-        return self.data.shape[1]
-
-    def __getitem__(self, idx):
-        return self.data[:, idx]
 
 class a_plus_b_mod_p_data(Dataset):
 
@@ -435,155 +280,7 @@ class a_minus_b_mod_p_data(Dataset):
         return self.data[:, idx]
 
 
-class ComputationModDataset(Dataset):
 
-    def __init__(self, p, eq_token, op_token, op_token2):
-        self.data = self.generate_data(p, eq_token, op_token, op_token2)
-    
-    def generate_data(self, p, eq_token, op_token, op_token2):
-        # x = torch.arange(p)
-        # y = torch.arange(1,p)
-        # x,y = torch.cartesian_prod(x,y).T
-
-        # eq = torch.ones_like(x) * eq_token
-        # op = torch.ones_like(x) * op_token
-        # result = x * y % p
-
-        # return torch.stack([x, op, y, eq, result])
-
-        a = torch.arange(p)
-        b = torch.arange(1, p)
-        c = torch.arange(1, p)
-        a, b, c= torch.cartesian_prod(a, b, c).T
-        # d = torch.arange(1, p)
-        # a, b, c, d = torch.cartesian_prod(a, b, c, d).T
-
-        eq = torch.ones_like(a) * eq_token
-        op1 = torch.ones_like(a) * op_token
-        op2 = torch.ones_like(a) * op_token2
-        result = (a * b  + c * b - a*c ) % p
-
-        # "All of our experiments used a small transformer trained on datasets of
-        # equations of the form a◦b + c◦d = e, where each of “a”, “◦”, “b”, “+”, “c”, “◦”, “d”, “=”, and “e”
-        # is a separate token"
-        return torch.stack([a, op1, b, op2, c, eq, result])
-
-    def __len__(self):
-        return self.data.shape[1]
-
-    def __getitem__(self, idx):
-        return self.data[:, idx]
-
-
-
-class MixSimpleDataset(Dataset):
-    def __init__(self, p, eq_token, op1, op2, op3):
-        self.data = self.generate_data(p, eq_token, op1, op2, op3)
-    
-    def generate_data(self, p, eq, op1, op2, op3):
-        """
-        Simple Mix Dataset including:
-        1. (a + b) mod p
-        2. (a - b) mod p
-        3. (a * b) mod p
-
-        op1: +
-        op2: -
-        op3: *
-        """
-
-        a = torch.arange(p)
-        b = torch.arange(1, p)
-
-        a, b = torch.cartesian_prod(a, b).T
-
-        eq = torch.ones_like(a) * eq
-        op1 = torch.ones_like(a) * op1
-        res1 = (a + b) % p
-
-        op2 = torch.ones_like(a) * op2
-        res2 = (a - b) % p
-
-        op3 = torch.ones_like(a) * op3
-        res3 = (a * b) % p
-
-        d1 = torch.stack([a, b, op1, eq, res1])
-        d2 = torch.stack([a, b, op2, eq, res2])
-        d3 = torch.stack([a, b, op3, eq, res3])
-    
-        return torch.cat([d1, d2, d3], dim=1)
-    
-    def __len__(self):
-        return self.data.shape[1]
-
-    def __getitem__(self, idx):
-        return self.data[:, idx]
-    
-
-
-class MixHardDataset(Dataset):
-    def __init__(self,p, eq, op1, op2, op3):
-        self.data = self.generate_data(p, eq, op1, op2, op3)
-    
-    def generate_data(self, p, eq, op1, op2, op3):
-        """
-        Hard Mix Dataset including:
-        1. (a + b - c) mod p
-        2. (a * b + c) mod p
-        3. (a * b + c * b) mod p
-        4. (a - b + c) mod p
-        
-
-        op1: +
-        op2: -
-        op3: *
-        """
-        a = torch.arange(p)
-        b = torch.arange(1, p)
-        c = torch.arange(1, p)
-
-        a, b, c = torch.cartesian_prod(a, b, c).T
-
-        eq = torch.ones_like(a) * eq
-        op1 = torch.ones_like(a) * op1
-        res1 = (a + b - c) % p
-
-        op2 = torch.ones_like(a) * op2
-        res2 = (a * b + c) % p
-
-        op3 = torch.ones_like(a) * op3
-        res3 = (a * b + c * b) % p
-        res4 = (a - b + c) % p
-
-        d1 = torch.stack([a, b, c, op1, op2, eq, res1])
-        d2 = torch.stack([a, b, c, op1, op3, eq, res2])
-        d3 = torch.stack([a, b, c, op1, op3, eq, res3])
-        d4 = torch.stack([a, b, c, op2, op3, eq, res4])
-
-        return torch.cat([d1, d2, d3, d4], dim=1)
-    
-    def __len__(self):
-        return self.data.shape[1]
-    
-    def __getitem__(self, idx):
-        return self.data[:, idx]
-        
-
-
-def new_requires_grad(model, is_required=True):
-    for name, module in model.named_modules():
-        if hasattr(module, "weight"):
-            module.weight.grad = None
-            module.weight.requires_grad = is_required
-        if hasattr(module, "bias"):
-            module.bias.grad = None
-            module.bias.requires_grad = is_required
-        if hasattr(module, "in_proj_weight"):
-            module.in_proj_weight.grad = None
-            module.in_proj_weight.requires_grad = is_required
-        if hasattr(module, "in_proj_bias"):
-            module.in_proj_bias.grad = None
-            module.in_proj_bias.requires_grad = is_required
 
 
 
@@ -629,15 +326,7 @@ def main(args):
         alpha=args.neural_alpha,
     ).to(device)
 
-    # ckpt_path = 'results/acc_(ab-cb)mod_p_p=23_AuxLoss_False_TD_2Layers_4Heads_128Dim_lr0.001_NeuralGrad_3NeuralLayers_12Alpha_40Beta_4InnerLoop.pt'
-    # neural_grad.load_state_dict(torch.load(ckpt_path, weights_only=True))
-
-    # neural_grad = NeuralGrad_OneMLP(
-    #     hidden_dim=args.neural_hidden_dim,
-    #     n_layers=args.neural_layers,
-    #     alpha=args.neural_alpha,
-    #     beta=args.neural_beta,
-    # ).to(device)
+   
 
     if args.tl_eval:
         ### load pretrained ckpt
@@ -1132,102 +821,95 @@ def main(args):
                        
                         cur_innerloop_attn_out_proj_grads_before = []
 
-                        if idx == -1:
-                            loops = 10
-                        else:
-                            loops = 1
+                        with torch.set_grad_enabled(is_train):
+                            logits = model(input[:-1])
+                            # calculate loss only on the answer part of the equation (last element
+                            loss = F.cross_entropy(logits[-1], input[-1])
+                            total_loss += loss.item() * input.shape[-1]
                         
-                        for i in range(loops):
+                        model.zero_grad()
+                        loss.backward()
 
-                            with torch.set_grad_enabled(is_train):
-                                logits = model(input[:-1])
-                                # calculate loss only on the answer part of the equation (last element
-                                loss = F.cross_entropy(logits[-1], input[-1])
-                                total_loss += loss.item() * input.shape[-1]
-                            
-                            model.zero_grad()
-                            loss.backward()
+                        g_h_before = 0
+                        g_h_after = 0
 
-                            g_h_before = 0
-                            g_h_after = 0
+                        # for name, param in model.named_parameters():
+
+                        #     grad = param.grad.view(-1,1)
+
+                        #     c = 1/ 1
+                        #     ## normalize gradient by l2 norm
+                        #     param.grad = c * param.grad.data / ((param.grad.data).norm(2) + 1e-12)
+
+                        #     ## gradient entropy
+                        #     normalized_abs_grad = torch.abs(param.grad)
+                        #     g_h_before = g_h_before - (normalized_abs_grad * torch.log(normalized_abs_grad + 1e-8)).sum()
+                        
+                        # g_hs_before.append(g_h_before.item())
+
+
+                        
+                        if args.track_grad:
+                            for name, param in model.named_parameters():
+                                    # print(name, param, param.grad)
+                                    grad = param.grad.view(-1,1)
+                                    ## track the gradients and compute the ratio
+                                    if  "layers" in name:
+                                        gradients_before[name].append(grad.norm(p=2).item())
+                                        
+                                        # if f"layers.{args.n_layers-1}.attn.out_proj.weight" in name:
+                                        #     cur_innerloop_attn_out_proj_grads_before.append(
+                                        #         grad.norm(p=2).item()
+                                        #     )
+                                
+
+                        if args.fft:
+                            for name, param in model.named_parameters():
+                                    # print(name, param, param.grad)
+                                    grad = param.grad.view(-1,1)
+                                    if  "layers.1.mlp.2.weight" in name:
+                                        #h_t.append((grad)[100].item())
+                                        h_t.append(grad[200].item())
+                                        #h_t.append(1)
+
+                        #######
+
+                        trigger = i < 500 if args.two_stage else False
+
+                        if args.filter == "none":
+                            pass
+                        elif args.filter == "ma":
+                            grads, h_t = gradfilter_ma(model, grads=grads, window_size=args.window_size, lamb=args.lamb, trigger=trigger, fft=args.fft, h_t=h_t)
+
+
 
                             # for name, param in model.named_parameters():
-
                             #     grad = param.grad.view(-1,1)
 
-                            #     c = 1/ 1
-                            #     ## normalize gradient by l2 norm
-                            #     param.grad = c * param.grad.data / ((param.grad.data).norm(2) + 1e-12)
-
                             #     ## gradient entropy
-                            #     normalized_abs_grad = torch.abs(param.grad)
-                            #     g_h_before = g_h_before - (normalized_abs_grad * torch.log(normalized_abs_grad + 1e-8)).sum()
+                            #     normalized_abs_grad = torch.abs(grad)
+                            #     g_h_after = g_h_after - (normalized_abs_grad * torch.log(normalized_abs_grad + 1e-8)).sum()
                             
-                            # g_hs_before.append(g_h_before.item())
-
+                            # g_hs_after.append(g_h_after.item())
 
                             
                             if args.track_grad:
                                 for name, param in model.named_parameters():
-                                        # print(name, param, param.grad)
-                                        grad = param.grad.view(-1,1)
-                                        ## track the gradients and compute the ratio
-                                        if  "layers" in name:
-                                            gradients_before[name].append(grad.norm(p=2).item())
-                                            
-                                            # if f"layers.{args.n_layers-1}.attn.out_proj.weight" in name:
-                                            #     cur_innerloop_attn_out_proj_grads_before.append(
-                                            #         grad.norm(p=2).item()
-                                            #     )
-                                    
+                                    # print(name, param, param.grad)
+                                    grad = param.grad.view(-1,1)
+                                    ## track the gradients and compute the ratio
+                                    if "layers" in name:
+                                        gradients_after[name].append(grad.norm(p=2).item())
 
-                            if args.fft:
-                                for name, param in model.named_parameters():
-                                        # print(name, param, param.grad)
-                                        grad = param.grad.view(-1,1)
-                                        if  "layers.1.mlp.2.weight" in name:
-                                            #h_t.append((grad)[100].item())
-                                            h_t.append(grad[200].item())
-                                            #h_t.append(1)
+                        elif args.filter == "ema":
+                            grads = gradfilter_ema(model, grads=grads, alpha=args.alpha, lamb=args.lamb)
+                        else:
+                            raise ValueError(f"Invalid gradient filter type `{args.filter}`")
 
-                            #######
+                        #######
 
-                            trigger = i < 500 if args.two_stage else False
-
-                            if args.filter == "none":
-                                pass
-                            elif args.filter == "ma":
-                                grads, h_t = gradfilter_ma(model, grads=grads, window_size=args.window_size, lamb=args.lamb, trigger=trigger, fft=args.fft, h_t=h_t)
-
-
-
-                                # for name, param in model.named_parameters():
-                                #     grad = param.grad.view(-1,1)
-
-                                #     ## gradient entropy
-                                #     normalized_abs_grad = torch.abs(grad)
-                                #     g_h_after = g_h_after - (normalized_abs_grad * torch.log(normalized_abs_grad + 1e-8)).sum()
-                                
-                                # g_hs_after.append(g_h_after.item())
-
-                                
-                                if args.track_grad:
-                                    for name, param in model.named_parameters():
-                                        # print(name, param, param.grad)
-                                        grad = param.grad.view(-1,1)
-                                        ## track the gradients and compute the ratio
-                                        if "layers" in name:
-                                            gradients_after[name].append(grad.norm(p=2).item())
-
-                            elif args.filter == "ema":
-                                grads = gradfilter_ema(model, grads=grads, alpha=args.alpha, lamb=args.lamb)
-                            else:
-                                raise ValueError(f"Invalid gradient filter type `{args.filter}`")
-
-                            #######
-
-                            optimizer.step()
-                            scheduler.step()
+                        optimizer.step()
+                        scheduler.step()
                 
                         i += 1
 
