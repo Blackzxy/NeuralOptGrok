@@ -571,7 +571,7 @@ def main(args):
                             g_hs_before.append(g_h_before.item())
                                 
                                     
-                            
+                        ## suggest to add the norm of the gradient to ensure the normalization in the neural grad    
                         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 
                         optimizer.step()  
@@ -863,14 +863,6 @@ def main(args):
                                         #     )
                                 
 
-                        if args.fft:
-                            for name, param in model.named_parameters():
-                                    # print(name, param, param.grad)
-                                    grad = param.grad.view(-1,1)
-                                    if  "layers.1.mlp.2.weight" in name:
-                                        #h_t.append((grad)[100].item())
-                                        h_t.append(grad[200].item())
-                                        #h_t.append(1)
 
                         #######
 
@@ -1052,7 +1044,7 @@ def main(args):
                 plt.savefig(f"results/acc_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_wd{args.weight_decay}_filter_{args.filter}.png", dpi=150)
                 #torch.save(neural_grad.state_dict(), f"results/acc_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_filter_{args.filter}.pt")
             else:
-                plt.savefig(f"results/acc_Nonormed_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_wd{args.weight_decay}.png", dpi=150)
+                plt.savefig(f"results/acc_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_wd{args.weight_decay}.png", dpi=150)
             plt.close()
 
             plt.plot(steps, train_loss, label="train")
@@ -1068,7 +1060,7 @@ def main(args):
             elif args.filter != "none":
                 plt.savefig(f"results/loss_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_wd{args.weight_decay}_filter_{args.filter}.png", dpi=150)
             else:
-                plt.savefig(f"results/loss_Nonormed_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_wd{args.weight_decay}.png", dpi=150)
+                plt.savefig(f"results/loss_{dataset_type}_p={args.p}_TD_{args.n_layers}Layers_{args.n_heads}Heads_{args.dim}Dim_lr{args.lr}_wd{args.weight_decay}.png", dpi=150)
           
             plt.close()
 
