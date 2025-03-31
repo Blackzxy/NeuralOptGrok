@@ -1,0 +1,50 @@
+Load task dataset for [a+b mod 97]...
+== Training Starts 🧨 ==
+num. params in base model: [0.423296M]
+num. params in amplifier: [16769]
+Num. of epochs: [111111]
+  0%|                                                                                                                                                              | 0/111111 [00:00<?, ?it/s]
+> /scratch/homes/sfan/NeuralOptGrok/src/train.py(212)amp_update()
+-> for name, param in model_copy.named_parameters():
+'token_embeddings.weight'
+  /scratch/homes/sfan/NeuralOptGrok/src/run.py(106)<module>()
+-> run(args)
+  /scratch/homes/sfan/NeuralOptGrok/src/run.py(91)run()
+-> train(args,
+  /scratch/homes/sfan/NeuralOptGrok/src/train.py(105)train()
+-> amp_update(amp, meta_optimizer, outer_loader, model_copy, opt, inner_batch=input)
+> /scratch/homes/sfan/NeuralOptGrok/src/train.py(212)amp_update()
+-> for name, param in model_copy.named_parameters():
+*** NameError: name 'w' is not defined
+NeuralAmplifier(
+  (network): Sequential(
+    (0): Linear(in_features=1, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Dropout(p=0.1, inplace=False)
+    (3): Linear(in_features=64, out_features=128, bias=True)
+    (4): ReLU()
+    (5): Dropout(p=0.1, inplace=False)
+    (6): Linear(in_features=128, out_features=64, bias=True)
+    (7): ReLU()
+    (8): Dropout(p=0.1, inplace=False)
+    (9): Linear(in_features=64, out_features=1, bias=True)
+    (10): Softmax(dim=-1)
+  )
+)
+  0%|                                                                                                                                                              | 0/111111 [01:45<?, ?it/s]
+Traceback (most recent call last):
+  File "/scratch/homes/sfan/NeuralOptGrok/src/run.py", line 106, in <module>
+    run(args)
+  File "/scratch/homes/sfan/NeuralOptGrok/src/run.py", line 91, in run
+    train(args,
+  File "/scratch/homes/sfan/NeuralOptGrok/src/train.py", line 105, in train
+    amp_update(amp, meta_optimizer, outer_loader, model_copy, opt, inner_batch=input)
+  File "/scratch/homes/sfan/NeuralOptGrok/src/train.py", line 212, in amp_update
+    for name, param in model_copy.named_parameters():
+  File "/scratch/homes/sfan/NeuralOptGrok/src/train.py", line 212, in amp_update
+    for name, param in model_copy.named_parameters():
+  File "/opt/conda/lib/python3.10/bdb.py", line 90, in trace_dispatch
+    return self.dispatch_line(frame)
+  File "/opt/conda/lib/python3.10/bdb.py", line 115, in dispatch_line
+    if self.quitting: raise BdbQuit
+bdb.BdbQuit

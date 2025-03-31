@@ -1,0 +1,375 @@
+2025-03-25 01:40:50,646 INFO    StreamThr :76925 [internal.py:wandb_internal():87] W&B internal server running at pid: 76925, started at: 2025-03-25 01:40:50.644865
+2025-03-25 01:40:50,649 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status
+2025-03-25 01:40:50,651 INFO    WriterThread:76925 [datastore.py:open_for_write():85] open: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/run-d5mt0vz8.wandb
+2025-03-25 01:40:50,654 DEBUG   SenderThread:76925 [sender.py:send():336] send: header
+2025-03-25 01:40:50,663 DEBUG   SenderThread:76925 [sender.py:send():336] send: run
+2025-03-25 01:40:51,175 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: check_version
+2025-03-25 01:40:51,191 INFO    SenderThread:76925 [dir_watcher.py:__init__():216] watching files in: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files
+2025-03-25 01:40:51,193 INFO    SenderThread:76925 [sender.py:_start_run_threads():1067] run started: d5mt0vz8 with start time 1742863250.643514
+2025-03-25 01:40:51,200 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: summary_record
+2025-03-25 01:40:51,216 INFO    SenderThread:76925 [sender.py:_save_file():1321] saving file wandb-summary.json with policy end
+2025-03-25 01:40:51,216 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: check_version
+2025-03-25 01:40:51,308 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: run_start
+2025-03-25 01:40:51,327 DEBUG   HandlerThread:76925 [system_info.py:__init__():31] System info init
+2025-03-25 01:40:51,327 DEBUG   HandlerThread:76925 [system_info.py:__init__():46] System info init done
+2025-03-25 01:40:51,328 INFO    HandlerThread:76925 [system_monitor.py:start():151] Starting system monitor
+2025-03-25 01:40:51,329 INFO    SystemMonitor:76925 [system_monitor.py:_start():116] Starting system asset monitoring threads
+2025-03-25 01:40:51,329 INFO    HandlerThread:76925 [system_monitor.py:probe():172] Collecting system info
+2025-03-25 01:40:51,347 INFO    SystemMonitor:76925 [interfaces.py:start():168] Started cpu
+2025-03-25 01:40:51,348 INFO    SystemMonitor:76925 [interfaces.py:start():168] Started disk
+2025-03-25 01:40:51,351 INFO    SystemMonitor:76925 [interfaces.py:start():168] Started gpu
+2025-03-25 01:40:51,352 INFO    SystemMonitor:76925 [interfaces.py:start():168] Started memory
+2025-03-25 01:40:51,354 INFO    SystemMonitor:76925 [interfaces.py:start():168] Started network
+2025-03-25 01:40:51,363 DEBUG   HandlerThread:76925 [system_info.py:probe():195] Probing system
+2025-03-25 01:40:51,366 DEBUG   HandlerThread:76925 [system_info.py:_probe_git():180] Probing git
+2025-03-25 01:40:51,378 DEBUG   HandlerThread:76925 [system_info.py:_probe_git():188] Probing git done
+2025-03-25 01:40:51,378 DEBUG   HandlerThread:76925 [system_info.py:probe():241] Probing system done
+2025-03-25 01:40:51,379 DEBUG   HandlerThread:76925 [system_monitor.py:probe():181] {'os': 'Linux-6.5.0-45-generic-x86_64-with-glibc2.31', 'python': '3.10.9', 'heartbeatAt': '2025-03-25T00:40:51.363283', 'startedAt': '2025-03-25T00:40:50.611728', 'docker': None, 'cuda': None, 'args': ('--task_type', 'a+b', '--p', '97', '--neuralgrok'), 'state': 'running', 'program': '/scratch/homes/sfan/NeuralOptGrok/src/run.py', 'codePath': 'src/run.py', 'git': {'remote': 'https://github.com/Blackzxy/NeuralOptGrok.git', 'commit': '3c7501e563a5f74f8b520c173be7d062c844a770'}, 'email': None, 'root': '/scratch/homes/sfan/NeuralOptGrok', 'host': 'post-0-0', 'username': 'sfan', 'executable': '/opt/conda/bin/python', 'cpu_count': 36, 'cpu_count_logical': 72, 'cpu_freq': {'current': 3286.0924444444454, 'min': 1000.0, 'max': 3900.0}, 'cpu_freq_per_core': [{'current': 3289.656, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.995, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.002, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.991, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.995, 'min': 1000.0, 'max': 3900.0}, {'current': 3284.7, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.006, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.0, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.996, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.998, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.998, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.025, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.0, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.125, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.002, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.005, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.0, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.002, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.998, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.994, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.004, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.001, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.002, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.001, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.002, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.006, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.0, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.993, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.997, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.997, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.007, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.995, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.997, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.993, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.007, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.997, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.006, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.998, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.0, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.997, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.001, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.002, 'min': 1000.0, 'max': 3900.0}, {'current': 3262.947, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.005, 'min': 1000.0, 'max': 3900.0}, {'current': 3263.148, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.996, 'min': 1000.0, 'max': 3900.0}, {'current': 3262.108, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.008, 'min': 1000.0, 'max': 3900.0}, {'current': 3262.702, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.001, 'min': 1000.0, 'max': 3900.0}, {'current': 3262.762, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.002, 'min': 1000.0, 'max': 3900.0}, {'current': 3263.298, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.995, 'min': 1000.0, 'max': 3900.0}, {'current': 3262.355, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.997, 'min': 1000.0, 'max': 3900.0}, {'current': 3262.706, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.997, 'min': 1000.0, 'max': 3900.0}, {'current': 3262.941, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.998, 'min': 1000.0, 'max': 3900.0}, {'current': 3262.983, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.998, 'min': 1000.0, 'max': 3900.0}, {'current': 3263.11, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.0, 'min': 1000.0, 'max': 3900.0}], 'disk': {'total': 5959.6396484375, 'used': 3030.0443077087402}, 'gpu': 'Tesla V100-SXM2-32GB', 'gpu_count': 1, 'gpu_devices': [{'name': 'Tesla V100-SXM2-32GB', 'memory_total': 34359738368}], 'memory': {'total': 376.50653076171875}}
+2025-03-25 01:40:51,380 INFO    HandlerThread:76925 [system_monitor.py:probe():182] Finished collecting system info
+2025-03-25 01:40:51,381 INFO    HandlerThread:76925 [system_monitor.py:probe():185] Publishing system info
+2025-03-25 01:40:51,381 DEBUG   HandlerThread:76925 [system_info.py:_save_pip():51] Saving list of pip packages installed into the current environment
+2025-03-25 01:40:51,384 DEBUG   HandlerThread:76925 [system_info.py:_save_pip():67] Saving pip packages done
+2025-03-25 01:40:51,384 DEBUG   HandlerThread:76925 [system_info.py:_save_conda():74] Saving list of conda packages installed into the current environment
+2025-03-25 01:40:52,187 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_created():275] file/dir created: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/wandb-summary.json
+2025-03-25 01:40:52,187 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_created():275] file/dir created: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/conda-environment.yaml
+2025-03-25 01:40:52,188 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_created():275] file/dir created: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/requirements.txt
+2025-03-25 01:40:56,572 DEBUG   HandlerThread:76925 [system_info.py:_save_conda():86] Saving conda packages done
+2025-03-25 01:40:56,576 INFO    HandlerThread:76925 [system_monitor.py:probe():187] Finished publishing system info
+2025-03-25 01:40:56,579 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:40:56,579 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:40:56,580 DEBUG   SenderThread:76925 [sender.py:send():336] send: files
+2025-03-25 01:40:56,582 INFO    SenderThread:76925 [sender.py:_save_file():1321] saving file wandb-metadata.json with policy now
+2025-03-25 01:40:56,590 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: stop_status
+2025-03-25 01:40:56,593 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: stop_status
+2025-03-25 01:40:56,848 DEBUG   SenderThread:76925 [sender.py:send():336] send: telemetry
+2025-03-25 01:40:57,056 INFO    wandb-upload_0:76925 [upload_job.py:push():138] Uploaded file /tmp/tmpdq34ud3_wandb/x0pyz6je-wandb-metadata.json
+2025-03-25 01:40:57,192 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/conda-environment.yaml
+2025-03-25 01:40:57,192 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_created():275] file/dir created: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/wandb-metadata.json
+2025-03-25 01:40:57,193 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_created():275] file/dir created: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/output.log
+2025-03-25 01:40:58,507 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: partial_history
+2025-03-25 01:40:58,509 DEBUG   SenderThread:76925 [sender.py:send():336] send: history
+2025-03-25 01:40:58,509 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: summary_record
+2025-03-25 01:40:58,512 INFO    SenderThread:76925 [sender.py:_save_file():1321] saving file wandb-summary.json with policy end
+2025-03-25 01:40:58,687 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: partial_history
+2025-03-25 01:40:58,689 DEBUG   SenderThread:76925 [sender.py:send():336] send: history
+2025-03-25 01:40:58,689 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: summary_record
+2025-03-25 01:40:58,692 INFO    SenderThread:76925 [sender.py:_save_file():1321] saving file wandb-summary.json with policy end
+2025-03-25 01:40:59,195 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/wandb-summary.json
+2025-03-25 01:40:59,196 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/output.log
+2025-03-25 01:41:00,195 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/output.log
+2025-03-25 01:41:01,196 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/output.log
+2025-03-25 01:41:01,719 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:41:06,720 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:41:11,590 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:41:11,590 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:41:11,721 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:41:16,592 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:41:16,722 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:41:21,593 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:41:21,728 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:41:22,219 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/config.yaml
+2025-03-25 01:41:26,594 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:41:26,908 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:41:31,227 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/output.log
+2025-03-25 01:41:31,594 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:41:32,813 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:41:36,595 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:41:37,814 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:41:41,596 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:41:42,815 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:41:46,597 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:41:47,819 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:41:51,247 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/output.log
+2025-03-25 01:41:51,355 DEBUG   SystemMonitor:76925 [system_monitor.py:_start():130] Starting system metrics aggregation loop
+2025-03-25 01:41:51,357 DEBUG   SenderThread:76925 [sender.py:send():336] send: stats
+2025-03-25 01:41:51,598 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:41:53,359 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:41:56,601 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:41:58,360 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:42:01,602 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:42:03,361 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:42:06,602 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:42:08,362 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:42:11,603 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:42:13,364 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:42:16,604 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:42:18,365 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:42:21,387 DEBUG   SenderThread:76925 [sender.py:send():336] send: stats
+2025-03-25 01:42:21,605 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:42:23,389 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:42:26,606 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:42:28,390 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:42:31,607 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:42:33,391 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:42:36,612 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:42:38,399 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:42:41,624 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:42:43,413 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:42:46,643 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:42:48,421 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:42:51,380 DEBUG   SenderThread:76925 [sender.py:send():336] send: stats
+2025-03-25 01:42:51,637 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:42:54,383 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:42:56,638 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:42:59,385 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:43:01,640 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:43:04,386 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:43:06,641 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:43:09,387 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:43:11,651 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:43:14,391 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:43:16,659 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:43:19,395 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:43:21,382 DEBUG   SenderThread:76925 [sender.py:send():336] send: stats
+2025-03-25 01:43:21,667 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:43:25,384 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:43:26,669 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:43:30,385 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:43:31,670 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:43:35,386 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:43:36,671 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:43:40,387 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:43:41,672 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:43:45,388 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:43:46,676 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:43:50,395 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:43:51,384 DEBUG   SenderThread:76925 [sender.py:send():336] send: stats
+2025-03-25 01:43:51,679 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:43:56,386 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:43:56,681 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:44:01,388 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:44:01,684 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:44:06,393 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:44:06,692 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:44:11,399 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:44:11,693 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:44:16,402 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:44:16,701 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:44:21,386 DEBUG   SenderThread:76925 [sender.py:send():336] send: stats
+2025-03-25 01:44:21,704 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:44:22,388 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:44:26,708 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:44:27,389 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:44:31,708 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:44:32,391 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:44:36,712 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:44:37,402 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:44:41,713 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:44:42,404 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:44:46,714 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:44:47,405 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:44:51,388 DEBUG   SenderThread:76925 [sender.py:send():336] send: stats
+2025-03-25 01:44:51,715 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:44:53,390 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:44:56,717 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:44:58,391 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:45:01,732 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:45:03,393 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:45:06,724 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:45:08,398 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:45:11,728 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:45:13,401 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:45:16,729 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:45:18,402 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:45:20,809 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/output.log
+2025-03-25 01:45:21,391 DEBUG   SenderThread:76925 [sender.py:send():336] send: stats
+2025-03-25 01:45:21,730 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:45:24,392 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:45:26,730 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:45:28,816 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/output.log
+2025-03-25 01:45:30,226 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:45:31,732 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:45:35,228 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:45:36,736 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:45:40,229 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:45:41,738 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:45:45,230 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:45:46,744 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:45:50,236 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:45:51,391 DEBUG   SenderThread:76925 [sender.py:send():336] send: stats
+2025-03-25 01:45:51,745 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:45:55,399 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:45:56,756 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:46:00,404 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:46:01,760 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:46:05,406 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:46:06,764 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:46:10,407 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:46:11,765 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:46:15,408 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:46:16,772 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:46:20,409 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:46:21,393 DEBUG   SenderThread:76925 [sender.py:send():336] send: stats
+2025-03-25 01:46:21,773 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:46:26,399 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:46:26,779 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:46:31,413 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:46:31,799 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:46:36,414 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:46:36,796 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:46:41,415 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:46:41,797 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:46:46,416 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:46:46,798 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:46:51,394 DEBUG   SenderThread:76925 [sender.py:send():336] send: stats
+2025-03-25 01:46:51,800 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:46:52,396 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:46:56,801 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:46:57,397 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:47:01,802 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:47:02,398 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:47:06,803 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:47:07,399 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:47:11,804 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:47:12,400 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:47:16,805 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:47:17,401 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:47:21,397 DEBUG   SenderThread:76925 [sender.py:send():336] send: stats
+2025-03-25 01:47:21,806 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:47:23,398 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:47:26,807 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:47:28,400 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:47:31,808 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:47:33,401 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:47:36,809 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:47:38,402 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:47:41,813 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:47:43,403 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:47:46,815 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 01:47:47,500 DEBUG   SenderThread:76925 [sender.py:send():336] send: exit
+2025-03-25 01:47:47,500 INFO    SenderThread:76925 [sender.py:send_exit():559] handling exit code: 1
+2025-03-25 01:47:47,501 INFO    SenderThread:76925 [sender.py:send_exit():561] handling runtime: 416
+2025-03-25 01:47:47,504 INFO    SenderThread:76925 [sender.py:_save_file():1321] saving file wandb-summary.json with policy end
+2025-03-25 01:47:47,504 INFO    SenderThread:76925 [sender.py:send_exit():567] send defer
+2025-03-25 01:47:47,505 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:47,506 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 0
+2025-03-25 01:47:47,506 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:47,507 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 0
+2025-03-25 01:47:47,507 INFO    SenderThread:76925 [sender.py:transition_state():587] send defer: 1
+2025-03-25 01:47:47,508 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:47,509 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 1
+2025-03-25 01:47:47,509 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:47,510 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 1
+2025-03-25 01:47:47,510 INFO    SenderThread:76925 [sender.py:transition_state():587] send defer: 2
+2025-03-25 01:47:47,511 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:47,512 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 2
+2025-03-25 01:47:47,512 INFO    HandlerThread:76925 [system_monitor.py:finish():161] Stopping system monitor
+2025-03-25 01:47:47,513 DEBUG   SystemMonitor:76925 [system_monitor.py:_start():137] Finished system metrics aggregation loop
+2025-03-25 01:47:47,513 DEBUG   SystemMonitor:76925 [system_monitor.py:_start():141] Publishing last batch of metrics
+2025-03-25 01:47:47,524 INFO    HandlerThread:76925 [interfaces.py:finish():175] Joined cpu
+2025-03-25 01:47:47,524 INFO    HandlerThread:76925 [interfaces.py:finish():175] Joined disk
+2025-03-25 01:47:47,524 INFO    HandlerThread:76925 [interfaces.py:finish():175] Joined gpu
+2025-03-25 01:47:47,525 INFO    HandlerThread:76925 [interfaces.py:finish():175] Joined memory
+2025-03-25 01:47:47,525 INFO    HandlerThread:76925 [interfaces.py:finish():175] Joined network
+2025-03-25 01:47:47,526 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:47,527 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 2
+2025-03-25 01:47:47,528 INFO    SenderThread:76925 [sender.py:transition_state():587] send defer: 3
+2025-03-25 01:47:47,529 DEBUG   SenderThread:76925 [sender.py:send():336] send: stats
+2025-03-25 01:47:47,529 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:47,531 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 3
+2025-03-25 01:47:47,531 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:47,532 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 3
+2025-03-25 01:47:47,533 INFO    SenderThread:76925 [sender.py:transition_state():587] send defer: 4
+2025-03-25 01:47:47,533 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:47,534 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 4
+2025-03-25 01:47:47,535 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:47,535 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 4
+2025-03-25 01:47:47,536 INFO    SenderThread:76925 [sender.py:transition_state():587] send defer: 5
+2025-03-25 01:47:47,537 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:47,538 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 5
+2025-03-25 01:47:47,539 DEBUG   SenderThread:76925 [sender.py:send():336] send: summary
+2025-03-25 01:47:47,542 INFO    SenderThread:76925 [sender.py:_save_file():1321] saving file wandb-summary.json with policy end
+2025-03-25 01:47:47,542 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:47,542 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 5
+2025-03-25 01:47:47,543 INFO    SenderThread:76925 [sender.py:transition_state():587] send defer: 6
+2025-03-25 01:47:47,544 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:47,544 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 6
+2025-03-25 01:47:47,545 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:47,545 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 6
+2025-03-25 01:47:47,546 INFO    SenderThread:76925 [sender.py:transition_state():587] send defer: 7
+2025-03-25 01:47:47,546 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 01:47:47,547 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:47,548 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 7
+2025-03-25 01:47:47,549 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:47,549 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 7
+2025-03-25 01:47:47,989 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/wandb-summary.json
+2025-03-25 01:47:48,501 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: poll_exit
+2025-03-25 01:47:48,502 INFO    SenderThread:76925 [sender.py:transition_state():587] send defer: 8
+2025-03-25 01:47:48,503 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: poll_exit
+2025-03-25 01:47:48,503 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:48,504 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 8
+2025-03-25 01:47:48,505 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:48,506 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 8
+2025-03-25 01:47:48,516 INFO    SenderThread:76925 [sender.py:transition_state():587] send defer: 9
+2025-03-25 01:47:48,517 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:48,517 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 9
+2025-03-25 01:47:48,517 DEBUG   SenderThread:76925 [sender.py:send():336] send: artifact
+2025-03-25 01:47:48,989 INFO    Thread-13 :76925 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/output.log
+2025-03-25 01:47:49,389 INFO    SenderThread:76925 [sender.py:send_artifact():1417] sent artifact job-https___github.com_Blackzxy_NeuralOptGrok.git_src_run.py - {'id': 'QXJ0aWZhY3Q6MTU5NTM4NDQ3OA==', 'digest': 'dacf626ed1ca0494f00a192ab0ff3625', 'state': 'COMMITTED', 'aliases': [{'artifactCollectionName': 'job-https___github.com_Blackzxy_NeuralOptGrok.git_src_run.py', 'alias': 'latest'}, {'artifactCollectionName': 'job-https___github.com_Blackzxy_NeuralOptGrok.git_src_run.py', 'alias': 'v1'}], 'artifactSequence': {'id': 'QXJ0aWZhY3RDb2xsZWN0aW9uOjU5MDkzNDQwMA==', 'latestArtifact': {'id': 'QXJ0aWZhY3Q6MTU5NTM4NDQ3OA==', 'versionIndex': 1}}, 'version': 'v1'}
+2025-03-25 01:47:49,390 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:49,390 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 9
+2025-03-25 01:47:49,390 INFO    SenderThread:76925 [dir_watcher.py:finish():362] shutting down directory watcher
+2025-03-25 01:47:49,502 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: poll_exit
+2025-03-25 01:47:49,991 INFO    SenderThread:76925 [dir_watcher.py:finish():392] scan: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files
+2025-03-25 01:47:49,992 INFO    SenderThread:76925 [dir_watcher.py:finish():406] scan save: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/config.yaml config.yaml
+2025-03-25 01:47:49,993 INFO    SenderThread:76925 [dir_watcher.py:finish():406] scan save: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/wandb-summary.json wandb-summary.json
+2025-03-25 01:47:49,996 INFO    SenderThread:76925 [dir_watcher.py:finish():406] scan save: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/requirements.txt requirements.txt
+2025-03-25 01:47:50,001 INFO    SenderThread:76925 [dir_watcher.py:finish():406] scan save: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/conda-environment.yaml conda-environment.yaml
+2025-03-25 01:47:50,005 INFO    SenderThread:76925 [dir_watcher.py:finish():406] scan save: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/wandb-metadata.json wandb-metadata.json
+2025-03-25 01:47:50,005 INFO    SenderThread:76925 [dir_watcher.py:finish():406] scan save: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/output.log output.log
+2025-03-25 01:47:50,012 INFO    SenderThread:76925 [sender.py:transition_state():587] send defer: 10
+2025-03-25 01:47:50,012 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: poll_exit
+2025-03-25 01:47:50,013 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:50,013 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 10
+2025-03-25 01:47:50,020 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:50,020 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 10
+2025-03-25 01:47:50,021 INFO    SenderThread:76925 [file_pusher.py:finish():162] shutting down file pusher
+2025-03-25 01:47:50,503 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: poll_exit
+2025-03-25 01:47:50,503 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: poll_exit
+2025-03-25 01:47:50,510 INFO    wandb-upload_0:76925 [upload_job.py:push():138] Uploaded file /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/config.yaml
+2025-03-25 01:47:50,545 INFO    wandb-upload_2:76925 [upload_job.py:push():138] Uploaded file /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/requirements.txt
+2025-03-25 01:47:50,545 INFO    wandb-upload_1:76925 [upload_job.py:push():138] Uploaded file /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/wandb-summary.json
+2025-03-25 01:47:50,561 INFO    wandb-upload_3:76925 [upload_job.py:push():138] Uploaded file /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/conda-environment.yaml
+2025-03-25 01:47:50,612 INFO    wandb-upload_4:76925 [upload_job.py:push():138] Uploaded file /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/files/output.log
+2025-03-25 01:47:50,812 INFO    Thread-12 (_thread_body):76925 [sender.py:transition_state():587] send defer: 11
+2025-03-25 01:47:50,813 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:50,813 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 11
+2025-03-25 01:47:50,814 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:50,817 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 11
+2025-03-25 01:47:50,817 INFO    SenderThread:76925 [file_pusher.py:join():167] waiting for file pusher
+2025-03-25 01:47:50,817 INFO    SenderThread:76925 [sender.py:transition_state():587] send defer: 12
+2025-03-25 01:47:50,817 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:50,818 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 12
+2025-03-25 01:47:50,819 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:50,819 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 12
+2025-03-25 01:47:51,504 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: poll_exit
+2025-03-25 01:47:51,631 INFO    SenderThread:76925 [sender.py:transition_state():587] send defer: 13
+2025-03-25 01:47:51,631 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: poll_exit
+2025-03-25 01:47:51,631 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:51,632 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 13
+2025-03-25 01:47:51,633 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:51,634 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 13
+2025-03-25 01:47:51,634 INFO    SenderThread:76925 [sender.py:transition_state():587] send defer: 14
+2025-03-25 01:47:51,635 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 01:47:51,635 INFO    HandlerThread:76925 [handler.py:handle_request_defer():170] handle defer: 14
+2025-03-25 01:47:51,635 DEBUG   SenderThread:76925 [sender.py:send():336] send: final
+2025-03-25 01:47:51,636 DEBUG   SenderThread:76925 [sender.py:send():336] send: footer
+2025-03-25 01:47:51,636 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: defer
+2025-03-25 01:47:51,636 INFO    SenderThread:76925 [sender.py:send_request_defer():583] handle sender defer: 14
+2025-03-25 01:47:51,637 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: poll_exit
+2025-03-25 01:47:51,638 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: poll_exit
+2025-03-25 01:47:51,638 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: poll_exit
+2025-03-25 01:47:51,638 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: server_info
+2025-03-25 01:47:51,639 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: poll_exit
+2025-03-25 01:47:51,640 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: get_summary
+2025-03-25 01:47:51,641 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: sampled_history
+2025-03-25 01:47:51,641 DEBUG   SenderThread:76925 [sender.py:send_request():363] send_request: server_info
+2025-03-25 01:47:51,801 INFO    MainThread:76925 [wandb_run.py:_footer_history_summary_info():3442] rendering history
+2025-03-25 01:47:51,801 INFO    MainThread:76925 [wandb_run.py:_footer_history_summary_info():3474] rendering summary
+2025-03-25 01:47:51,802 INFO    MainThread:76925 [wandb_run.py:_footer_sync_info():3398] logging synced files
+2025-03-25 01:47:51,803 DEBUG   HandlerThread:76925 [handler.py:handle_request():144] handle_request: shutdown
+2025-03-25 01:47:51,804 INFO    HandlerThread:76925 [handler.py:finish():841] shutting down handler
+2025-03-25 01:47:52,640 INFO    WriterThread:76925 [datastore.py:close():299] close: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_014050-d5mt0vz8/run-d5mt0vz8.wandb
+2025-03-25 01:47:52,801 INFO    SenderThread:76925 [sender.py:finish():1493] shutting down sender
+2025-03-25 01:47:52,801 INFO    SenderThread:76925 [file_pusher.py:finish():162] shutting down file pusher
+2025-03-25 01:47:52,801 INFO    SenderThread:76925 [file_pusher.py:join():167] waiting for file pusher

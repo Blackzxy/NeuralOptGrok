@@ -1,0 +1,26 @@
+2025-03-24 22:24:14,782 INFO    MainThread:45386 [wandb_setup.py:_flush():68] Configure stats pid to 45386
+2025-03-24 22:24:14,782 INFO    MainThread:45386 [wandb_setup.py:_flush():68] Loading settings from /home/runai-home/.config/wandb/settings
+2025-03-24 22:24:14,783 INFO    MainThread:45386 [wandb_setup.py:_flush():68] Loading settings from /scratch/homes/sfan/NeuralOptGrok/wandb/settings
+2025-03-24 22:24:14,784 INFO    MainThread:45386 [wandb_setup.py:_flush():68] Loading settings from environment variables: {'api_key': '***REDACTED***', '_require_service': 'True'}
+2025-03-24 22:24:14,784 INFO    MainThread:45386 [wandb_setup.py:_flush():68] Inferring run settings from compute environment: {'program_relpath': 'src/run.py', 'program': '/scratch/homes/sfan/NeuralOptGrok/src/run.py'}
+2025-03-24 22:24:14,785 INFO    MainThread:45386 [wandb_init.py:_log_setup():492] Logging user logs to /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250324_222414-ygzjzp0m/logs/debug.log
+2025-03-24 22:24:14,785 INFO    MainThread:45386 [wandb_init.py:_log_setup():493] Logging internal logs to /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250324_222414-ygzjzp0m/logs/debug-internal.log
+2025-03-24 22:24:14,786 INFO    MainThread:45386 [wandb_init.py:init():532] calling init triggers
+2025-03-24 22:24:14,786 INFO    MainThread:45386 [wandb_init.py:init():538] wandb.init called with sweep_config: {}
+config: {}
+2025-03-24 22:24:14,787 INFO    MainThread:45386 [wandb_init.py:init():588] starting backend
+2025-03-24 22:24:14,787 INFO    MainThread:45386 [wandb_init.py:init():592] setting up manager
+2025-03-24 22:24:14,790 INFO    MainThread:45386 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2025-03-24 22:24:14,791 INFO    MainThread:45386 [wandb_init.py:init():599] backend started and connected
+2025-03-24 22:24:14,793 INFO    MainThread:45386 [wandb_init.py:init():687] updated telemetry
+2025-03-24 22:24:14,806 INFO    MainThread:45386 [wandb_init.py:init():727] communicating run to backend with 60.0 second timeout
+2025-03-24 22:24:15,247 INFO    MainThread:45386 [wandb_run.py:_on_init():2134] communicating current version
+2025-03-24 22:24:15,340 INFO    MainThread:45386 [wandb_run.py:_on_init():2143] got version response upgrade_message: "wandb version 0.19.8 is available!  To upgrade, please run:\n $ pip install wandb --upgrade"
+
+2025-03-24 22:24:15,340 INFO    MainThread:45386 [wandb_init.py:init():775] starting run threads in backend
+2025-03-24 22:24:19,746 INFO    MainThread:45386 [wandb_run.py:_console_start():2114] atexit reg
+2025-03-24 22:24:19,746 INFO    MainThread:45386 [wandb_run.py:_redirect():1969] redirect: SettingsConsole.WRAP_RAW
+2025-03-24 22:24:19,747 INFO    MainThread:45386 [wandb_run.py:_redirect():2034] Wrapping output streams.
+2025-03-24 22:24:19,747 INFO    MainThread:45386 [wandb_run.py:_redirect():2059] Redirects installed.
+2025-03-24 22:24:19,748 INFO    MainThread:45386 [wandb_init.py:init():817] run started, returning control to user process
+2025-03-24 22:24:26,485 WARNING MsgRouterThr:45386 [router.py:message_loop():77] message_loop has been closed

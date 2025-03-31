@@ -1,0 +1,8 @@
+
+Load task dataset for [a+b mod 97]...
+Traceback (most recent call last):
+  File "/scratch/homes/sfan/NeuralOptGrok/src/run.py", line 106, in <module>
+    run(args)
+  File "/scratch/homes/sfan/NeuralOptGrok/src/run.py", line 83, in run
+    amp = NeuralGrad(
+NameError: name 'NeuralGrad' is not defined

@@ -1,0 +1,1 @@
+{"global_step": 71, "weight_norm": 123.28109741210938, "weight_entropy": 47846.01171875, "grad_norm": 5.385164737701416, "grad_entropy": NaN, "_timestamp": 1742917882.7022111, "_runtime": 30.673399209976196, "_step": 78, "train_loss": 4.463687154981825, "train_acc": 0.02855428784257836, "test_loss": 4.870036649703979, "test_acc": 0.0017578125, "_wandb": {"runtime": 30}}

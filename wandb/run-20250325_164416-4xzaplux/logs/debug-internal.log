@@ -1,0 +1,191 @@
+2025-03-25 16:44:16,032 INFO    StreamThr :13632 [internal.py:wandb_internal():87] W&B internal server running at pid: 13632, started at: 2025-03-25 16:44:16.031073
+2025-03-25 16:44:16,056 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: status
+2025-03-25 16:44:16,083 INFO    WriterThread:13632 [datastore.py:open_for_write():85] open: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/run-4xzaplux.wandb
+2025-03-25 16:44:16,085 DEBUG   SenderThread:13632 [sender.py:send():336] send: header
+2025-03-25 16:44:16,086 DEBUG   SenderThread:13632 [sender.py:send():336] send: run
+2025-03-25 16:44:16,583 INFO    SenderThread:13632 [dir_watcher.py:__init__():216] watching files in: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files
+2025-03-25 16:44:16,583 INFO    SenderThread:13632 [sender.py:_start_run_threads():1067] run started: 4xzaplux with start time 1742917456.028472
+2025-03-25 16:44:16,583 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: summary_record
+2025-03-25 16:44:16,583 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: check_version
+2025-03-25 16:44:16,585 INFO    SenderThread:13632 [sender.py:_save_file():1321] saving file wandb-summary.json with policy end
+2025-03-25 16:44:16,585 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: check_version
+2025-03-25 16:44:16,729 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: run_start
+2025-03-25 16:44:16,741 DEBUG   HandlerThread:13632 [system_info.py:__init__():31] System info init
+2025-03-25 16:44:16,741 DEBUG   HandlerThread:13632 [system_info.py:__init__():46] System info init done
+2025-03-25 16:44:16,741 INFO    HandlerThread:13632 [system_monitor.py:start():151] Starting system monitor
+2025-03-25 16:44:16,741 INFO    SystemMonitor:13632 [system_monitor.py:_start():116] Starting system asset monitoring threads
+2025-03-25 16:44:16,741 INFO    HandlerThread:13632 [system_monitor.py:probe():172] Collecting system info
+2025-03-25 16:44:16,741 INFO    SystemMonitor:13632 [interfaces.py:start():168] Started cpu
+2025-03-25 16:44:16,742 INFO    SystemMonitor:13632 [interfaces.py:start():168] Started disk
+2025-03-25 16:44:16,743 INFO    SystemMonitor:13632 [interfaces.py:start():168] Started gpu
+2025-03-25 16:44:16,743 INFO    SystemMonitor:13632 [interfaces.py:start():168] Started memory
+2025-03-25 16:44:16,743 INFO    SystemMonitor:13632 [interfaces.py:start():168] Started network
+2025-03-25 16:44:16,882 DEBUG   HandlerThread:13632 [system_info.py:probe():195] Probing system
+2025-03-25 16:44:16,885 DEBUG   HandlerThread:13632 [system_info.py:_probe_git():180] Probing git
+2025-03-25 16:44:16,898 DEBUG   HandlerThread:13632 [system_info.py:_probe_git():188] Probing git done
+2025-03-25 16:44:16,898 DEBUG   HandlerThread:13632 [system_info.py:probe():241] Probing system done
+2025-03-25 16:44:16,898 DEBUG   HandlerThread:13632 [system_monitor.py:probe():181] {'os': 'Linux-6.5.0-45-generic-x86_64-with-glibc2.31', 'python': '3.10.9', 'heartbeatAt': '2025-03-25T15:44:16.882257', 'startedAt': '2025-03-25T15:44:16.006480', 'docker': None, 'cuda': None, 'args': ('--task_type', 'a+b', '--p', '97', '--neuralgrok'), 'state': 'running', 'program': '/scratch/homes/sfan/NeuralOptGrok/src/run.py', 'codePath': 'src/run.py', 'git': {'remote': 'https://github.com/Blackzxy/NeuralOptGrok.git', 'commit': '3c7501e563a5f74f8b520c173be7d062c844a770'}, 'email': None, 'root': '/scratch/homes/sfan/NeuralOptGrok', 'host': 'post-0-0', 'username': 'sfan', 'executable': '/opt/conda/bin/python', 'cpu_count': 36, 'cpu_count_logical': 72, 'cpu_freq': {'current': 3418.0019305555556, 'min': 1000.0, 'max': 3900.0}, 'cpu_freq_per_core': [{'current': 3300.0, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.009, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.005, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.005, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.003, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.987, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.0, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.003, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.994, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.993, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.009, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.005, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.005, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.998, 'min': 1000.0, 'max': 3900.0}, {'current': 2579.774, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.993, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.005, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.998, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.007, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.325, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.993, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.003, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.002, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.0, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.99, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.0, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.992, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.992, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.996, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.997, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.003, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.0, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.994, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.996, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.993, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.991, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.0, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.007, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.005, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.002, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.001, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.004, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.993, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.006, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 2579.809, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.0, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.003, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.001, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.001, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.993, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.004, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.998, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.999, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.001, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.007, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.996, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.994, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.009, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.998, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.998, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.0, 'min': 1000.0, 'max': 3900.0}, {'current': 3299.994, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.004, 'min': 1000.0, 'max': 3900.0}, {'current': 3300.002, 'min': 1000.0, 'max': 3900.0}], 'disk': {'total': 5959.6396484375, 'used': 4370.976715087891}, 'gpu': 'Tesla V100-SXM2-32GB', 'gpu_count': 1, 'gpu_devices': [{'name': 'Tesla V100-SXM2-32GB', 'memory_total': 34359738368}], 'memory': {'total': 376.5065231323242}}
+2025-03-25 16:44:16,899 INFO    HandlerThread:13632 [system_monitor.py:probe():182] Finished collecting system info
+2025-03-25 16:44:16,899 INFO    HandlerThread:13632 [system_monitor.py:probe():185] Publishing system info
+2025-03-25 16:44:16,899 DEBUG   HandlerThread:13632 [system_info.py:_save_pip():51] Saving list of pip packages installed into the current environment
+2025-03-25 16:44:16,901 DEBUG   HandlerThread:13632 [system_info.py:_save_pip():67] Saving pip packages done
+2025-03-25 16:44:16,901 DEBUG   HandlerThread:13632 [system_info.py:_save_conda():74] Saving list of conda packages installed into the current environment
+2025-03-25 16:44:17,588 INFO    Thread-13 :13632 [dir_watcher.py:_on_file_created():275] file/dir created: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/wandb-summary.json
+2025-03-25 16:44:17,589 INFO    Thread-13 :13632 [dir_watcher.py:_on_file_created():275] file/dir created: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/requirements.txt
+2025-03-25 16:44:17,589 INFO    Thread-13 :13632 [dir_watcher.py:_on_file_created():275] file/dir created: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/conda-environment.yaml
+2025-03-25 16:44:24,510 DEBUG   HandlerThread:13632 [system_info.py:_save_conda():86] Saving conda packages done
+2025-03-25 16:44:24,513 INFO    HandlerThread:13632 [system_monitor.py:probe():187] Finished publishing system info
+2025-03-25 16:44:24,515 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-25 16:44:24,517 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 16:44:24,517 DEBUG   SenderThread:13632 [sender.py:send():336] send: files
+2025-03-25 16:44:24,518 INFO    SenderThread:13632 [sender.py:_save_file():1321] saving file wandb-metadata.json with policy now
+2025-03-25 16:44:24,524 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: stop_status
+2025-03-25 16:44:24,524 DEBUG   SenderThread:13632 [sender.py:send():336] send: telemetry
+2025-03-25 16:44:24,525 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: stop_status
+2025-03-25 16:44:24,608 INFO    Thread-13 :13632 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/conda-environment.yaml
+2025-03-25 16:44:24,608 INFO    Thread-13 :13632 [dir_watcher.py:_on_file_created():275] file/dir created: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/wandb-metadata.json
+2025-03-25 16:44:24,995 INFO    wandb-upload_0:13632 [upload_job.py:push():138] Uploaded file /tmp/tmpmq8fkmldwandb/oau2a92q-wandb-metadata.json
+2025-03-25 16:44:25,610 INFO    Thread-13 :13632 [dir_watcher.py:_on_file_created():275] file/dir created: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/output.log
+2025-03-25 16:44:26,495 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: partial_history
+2025-03-25 16:44:26,496 DEBUG   SenderThread:13632 [sender.py:send():336] send: history
+2025-03-25 16:44:26,497 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: summary_record
+2025-03-25 16:44:26,499 INFO    SenderThread:13632 [sender.py:_save_file():1321] saving file wandb-summary.json with policy end
+2025-03-25 16:44:26,610 INFO    Thread-13 :13632 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/wandb-summary.json
+2025-03-25 16:44:26,665 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: partial_history
+2025-03-25 16:44:26,666 DEBUG   SenderThread:13632 [sender.py:send():336] send: history
+2025-03-25 16:44:26,666 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: summary_record
+2025-03-25 16:44:26,668 INFO    SenderThread:13632 [sender.py:_save_file():1321] saving file wandb-summary.json with policy end
+2025-03-25 16:44:26,705 DEBUG   SenderThread:13632 [sender.py:send():336] send: exit
+2025-03-25 16:44:26,705 INFO    SenderThread:13632 [sender.py:send_exit():559] handling exit code: 1
+2025-03-25 16:44:26,705 INFO    SenderThread:13632 [sender.py:send_exit():561] handling runtime: 9
+2025-03-25 16:44:26,707 INFO    SenderThread:13632 [sender.py:_save_file():1321] saving file wandb-summary.json with policy end
+2025-03-25 16:44:26,707 INFO    SenderThread:13632 [sender.py:send_exit():567] send defer
+2025-03-25 16:44:26,707 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:26,708 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 0
+2025-03-25 16:44:26,708 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:26,708 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 0
+2025-03-25 16:44:26,708 INFO    SenderThread:13632 [sender.py:transition_state():587] send defer: 1
+2025-03-25 16:44:26,708 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:26,708 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 1
+2025-03-25 16:44:26,708 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:26,708 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 1
+2025-03-25 16:44:26,708 INFO    SenderThread:13632 [sender.py:transition_state():587] send defer: 2
+2025-03-25 16:44:26,708 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:26,708 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 2
+2025-03-25 16:44:26,708 INFO    HandlerThread:13632 [system_monitor.py:finish():161] Stopping system monitor
+2025-03-25 16:44:26,712 DEBUG   SystemMonitor:13632 [system_monitor.py:_start():130] Starting system metrics aggregation loop
+2025-03-25 16:44:26,715 DEBUG   SystemMonitor:13632 [system_monitor.py:_start():137] Finished system metrics aggregation loop
+2025-03-25 16:44:26,715 DEBUG   SystemMonitor:13632 [system_monitor.py:_start():141] Publishing last batch of metrics
+2025-03-25 16:44:26,718 INFO    HandlerThread:13632 [interfaces.py:finish():175] Joined cpu
+2025-03-25 16:44:26,718 INFO    HandlerThread:13632 [interfaces.py:finish():175] Joined disk
+2025-03-25 16:44:26,718 INFO    HandlerThread:13632 [interfaces.py:finish():175] Joined gpu
+2025-03-25 16:44:26,718 INFO    HandlerThread:13632 [interfaces.py:finish():175] Joined memory
+2025-03-25 16:44:26,718 INFO    HandlerThread:13632 [interfaces.py:finish():175] Joined network
+2025-03-25 16:44:26,719 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:26,719 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 2
+2025-03-25 16:44:26,719 INFO    SenderThread:13632 [sender.py:transition_state():587] send defer: 3
+2025-03-25 16:44:26,719 DEBUG   SenderThread:13632 [sender.py:send():336] send: stats
+2025-03-25 16:44:26,720 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:26,720 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 3
+2025-03-25 16:44:26,720 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:26,720 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 3
+2025-03-25 16:44:26,720 INFO    SenderThread:13632 [sender.py:transition_state():587] send defer: 4
+2025-03-25 16:44:26,720 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:26,720 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 4
+2025-03-25 16:44:26,720 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:26,720 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 4
+2025-03-25 16:44:26,720 INFO    SenderThread:13632 [sender.py:transition_state():587] send defer: 5
+2025-03-25 16:44:26,720 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:26,720 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 5
+2025-03-25 16:44:26,721 DEBUG   SenderThread:13632 [sender.py:send():336] send: summary
+2025-03-25 16:44:26,723 INFO    SenderThread:13632 [sender.py:_save_file():1321] saving file wandb-summary.json with policy end
+2025-03-25 16:44:26,723 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:26,723 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 5
+2025-03-25 16:44:26,723 INFO    SenderThread:13632 [sender.py:transition_state():587] send defer: 6
+2025-03-25 16:44:26,726 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:26,727 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 6
+2025-03-25 16:44:26,727 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:26,727 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 6
+2025-03-25 16:44:26,765 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 16:44:26,933 INFO    SenderThread:13632 [sender.py:transition_state():587] send defer: 7
+2025-03-25 16:44:26,934 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:26,934 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 7
+2025-03-25 16:44:26,934 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:26,934 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 7
+2025-03-25 16:44:27,612 INFO    Thread-13 :13632 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/config.yaml
+2025-03-25 16:44:27,612 INFO    Thread-13 :13632 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/wandb-summary.json
+2025-03-25 16:44:27,612 INFO    Thread-13 :13632 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/output.log
+2025-03-25 16:44:27,705 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: poll_exit
+2025-03-25 16:44:28,613 INFO    Thread-13 :13632 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/output.log
+2025-03-25 16:44:29,929 INFO    SenderThread:13632 [sender.py:transition_state():587] send defer: 8
+2025-03-25 16:44:29,929 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: poll_exit
+2025-03-25 16:44:29,930 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:29,930 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 8
+2025-03-25 16:44:29,930 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:29,930 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 8
+2025-03-25 16:44:29,948 INFO    SenderThread:13632 [sender.py:transition_state():587] send defer: 9
+2025-03-25 16:44:29,949 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:29,950 DEBUG   SenderThread:13632 [sender.py:send():336] send: artifact
+2025-03-25 16:44:29,951 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 9
+2025-03-25 16:44:30,615 INFO    Thread-13 :13632 [dir_watcher.py:_on_file_modified():292] file/dir modified: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/output.log
+2025-03-25 16:44:30,794 INFO    SenderThread:13632 [sender.py:send_artifact():1417] sent artifact job-https___github.com_Blackzxy_NeuralOptGrok.git_src_run.py - {'id': 'QXJ0aWZhY3Q6MTU5NTM4NDQ3OA==', 'digest': 'dacf626ed1ca0494f00a192ab0ff3625', 'state': 'COMMITTED', 'aliases': [{'artifactCollectionName': 'job-https___github.com_Blackzxy_NeuralOptGrok.git_src_run.py', 'alias': 'latest'}, {'artifactCollectionName': 'job-https___github.com_Blackzxy_NeuralOptGrok.git_src_run.py', 'alias': 'v1'}], 'artifactSequence': {'id': 'QXJ0aWZhY3RDb2xsZWN0aW9uOjU5MDkzNDQwMA==', 'latestArtifact': {'id': 'QXJ0aWZhY3Q6MTU5NTcxNzIzOA==', 'versionIndex': 3}}, 'version': 'v1'}
+2025-03-25 16:44:30,794 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:30,794 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 9
+2025-03-25 16:44:30,794 INFO    SenderThread:13632 [dir_watcher.py:finish():362] shutting down directory watcher
+2025-03-25 16:44:31,616 INFO    SenderThread:13632 [dir_watcher.py:finish():392] scan: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files
+2025-03-25 16:44:31,617 INFO    SenderThread:13632 [dir_watcher.py:finish():406] scan save: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/config.yaml config.yaml
+2025-03-25 16:44:31,617 INFO    SenderThread:13632 [dir_watcher.py:finish():406] scan save: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/wandb-summary.json wandb-summary.json
+2025-03-25 16:44:31,621 INFO    SenderThread:13632 [dir_watcher.py:finish():406] scan save: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/requirements.txt requirements.txt
+2025-03-25 16:44:31,626 INFO    SenderThread:13632 [dir_watcher.py:finish():406] scan save: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/conda-environment.yaml conda-environment.yaml
+2025-03-25 16:44:31,629 INFO    SenderThread:13632 [dir_watcher.py:finish():406] scan save: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/wandb-metadata.json wandb-metadata.json
+2025-03-25 16:44:31,629 INFO    SenderThread:13632 [dir_watcher.py:finish():406] scan save: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/output.log output.log
+2025-03-25 16:44:31,630 INFO    SenderThread:13632 [sender.py:transition_state():587] send defer: 10
+2025-03-25 16:44:31,633 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:31,633 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 10
+2025-03-25 16:44:31,634 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:31,634 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 10
+2025-03-25 16:44:31,634 INFO    SenderThread:13632 [file_pusher.py:finish():162] shutting down file pusher
+2025-03-25 16:44:32,088 INFO    wandb-upload_4:13632 [upload_job.py:push():138] Uploaded file /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/output.log
+2025-03-25 16:44:32,135 INFO    wandb-upload_2:13632 [upload_job.py:push():138] Uploaded file /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/requirements.txt
+2025-03-25 16:44:32,136 INFO    wandb-upload_0:13632 [upload_job.py:push():138] Uploaded file /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/config.yaml
+2025-03-25 16:44:32,144 INFO    wandb-upload_3:13632 [upload_job.py:push():138] Uploaded file /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/conda-environment.yaml
+2025-03-25 16:44:32,172 INFO    wandb-upload_1:13632 [upload_job.py:push():138] Uploaded file /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/files/wandb-summary.json
+2025-03-25 16:44:32,372 INFO    Thread-12 (_thread_body):13632 [sender.py:transition_state():587] send defer: 11
+2025-03-25 16:44:32,373 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:32,373 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 11
+2025-03-25 16:44:32,373 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:32,374 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 11
+2025-03-25 16:44:32,374 INFO    SenderThread:13632 [file_pusher.py:join():167] waiting for file pusher
+2025-03-25 16:44:32,374 INFO    SenderThread:13632 [sender.py:transition_state():587] send defer: 12
+2025-03-25 16:44:32,374 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:32,374 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 12
+2025-03-25 16:44:32,374 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: status_report
+2025-03-25 16:44:32,374 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:32,374 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 12
+2025-03-25 16:44:32,587 INFO    SenderThread:13632 [sender.py:transition_state():587] send defer: 13
+2025-03-25 16:44:32,587 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:32,587 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 13
+2025-03-25 16:44:32,587 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:32,587 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 13
+2025-03-25 16:44:32,587 INFO    SenderThread:13632 [sender.py:transition_state():587] send defer: 14
+2025-03-25 16:44:32,587 DEBUG   SenderThread:13632 [sender.py:send():336] send: final
+2025-03-25 16:44:32,587 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: defer
+2025-03-25 16:44:32,587 INFO    HandlerThread:13632 [handler.py:handle_request_defer():170] handle defer: 14
+2025-03-25 16:44:32,587 DEBUG   SenderThread:13632 [sender.py:send():336] send: footer
+2025-03-25 16:44:32,588 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: defer
+2025-03-25 16:44:32,588 INFO    SenderThread:13632 [sender.py:send_request_defer():583] handle sender defer: 14
+2025-03-25 16:44:32,588 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: poll_exit
+2025-03-25 16:44:32,588 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: server_info
+2025-03-25 16:44:32,588 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: get_summary
+2025-03-25 16:44:32,588 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: sampled_history
+2025-03-25 16:44:32,589 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: poll_exit
+2025-03-25 16:44:32,590 DEBUG   SenderThread:13632 [sender.py:send_request():363] send_request: server_info
+2025-03-25 16:44:32,745 INFO    MainThread:13632 [wandb_run.py:_footer_history_summary_info():3442] rendering history
+2025-03-25 16:44:32,746 INFO    MainThread:13632 [wandb_run.py:_footer_history_summary_info():3474] rendering summary
+2025-03-25 16:44:32,746 INFO    MainThread:13632 [wandb_run.py:_footer_sync_info():3398] logging synced files
+2025-03-25 16:44:32,746 DEBUG   HandlerThread:13632 [handler.py:handle_request():144] handle_request: shutdown
+2025-03-25 16:44:32,746 INFO    HandlerThread:13632 [handler.py:finish():841] shutting down handler
+2025-03-25 16:44:33,589 INFO    WriterThread:13632 [datastore.py:close():299] close: /scratch/homes/sfan/NeuralOptGrok/wandb/run-20250325_164416-4xzaplux/run-4xzaplux.wandb
+2025-03-25 16:44:33,745 INFO    SenderThread:13632 [sender.py:finish():1493] shutting down sender
+2025-03-25 16:44:33,745 INFO    SenderThread:13632 [file_pusher.py:finish():162] shutting down file pusher
+2025-03-25 16:44:33,745 INFO    SenderThread:13632 [file_pusher.py:join():167] waiting for file pusher

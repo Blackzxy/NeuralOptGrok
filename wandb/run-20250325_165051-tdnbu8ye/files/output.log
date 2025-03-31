@@ -1,0 +1,43 @@
+Load task dataset for [a+b mod 97]...
+== Training Starts 🧨 ==
+num. params in base model: [0.423296M]
+num. params in amplifier: [16769]
+Num. of epochs: [111111]
+
+
+
+
+
+
+
+  0%|                                                                                                                                                                                                                                                                                                                                                            | 7/111111 [00:21<95:47:44,  3.10s/it]
+Traceback (most recent call last):
+  File "/scratch/homes/sfan/NeuralOptGrok/src/run.py", line 106, in <module>
+    run(args)
+  File "/scratch/homes/sfan/NeuralOptGrok/src/run.py", line 91, in run
+    train(args,
+  File "/scratch/homes/sfan/NeuralOptGrok/src/train.py", line 105, in train
+    amp_update(amp, meta_optimizer, outer_loader, model_copy, opt, inner_batch=input, device=args.device)
+  File "/scratch/homes/sfan/NeuralOptGrok/src/train.py", line 240, in amp_update
+    trans_module_weights(model_copy, amp)
+  File "/scratch/homes/sfan/NeuralOptGrok/src/train.py", line 204, in trans_module_weights
+    modified_grad = amp(grad).view(module.in_proj_weight.grad.shape)
+  File "/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/scratch/homes/sfan/NeuralOptGrok/src/model.py", line 49, in forward
+    p = self.network(g) # shape: [g.shape]
+  File "/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+  File "/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/nn/modules/linear.py", line 125, in forward
+    return F.linear(input, self.weight, self.bias)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 24.00 MiB. GPU 0 has a total capacity of 31.73 GiB of which 20.69 MiB is free. Process 799261 has 31.71 GiB memory in use. Of the allocated memory 31.15 GiB is allocated by PyTorch, and 191.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

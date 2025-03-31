@@ -1,0 +1,47 @@
+Load task dataset for [a+b mod 97]...
+== Training Starts 🧨 ==
+num. params in base model: [0.423296M]
+num. params in amplifier: [16769]
+Num. of epochs: [111111]
+token_embeddings
+position_embeddings
+layers
+0
+ln_1
+ln_2
+attn
+out_proj
+mlp
+0
+1
+2
+1
+ln_1
+ln_2
+attn
+out_proj
+mlp
+0
+1
+2
+ln_f
+head
+> /scratch/homes/sfan/NeuralOptGrok/src/train.py(195)amp_update()
+-> for name, module in model_copy.named_children():
+  0%|                                                                                                                                                                                                                                                                                                                                                        | 0/111111 [00:41<?, ?it/s]
+Traceback (most recent call last):
+  File "/scratch/homes/sfan/NeuralOptGrok/src/run.py", line 106, in <module>
+    run(args)
+  File "/scratch/homes/sfan/NeuralOptGrok/src/run.py", line 91, in run
+    train(args,
+  File "/scratch/homes/sfan/NeuralOptGrok/src/train.py", line 103, in train
+    amp_update(amp, meta_optimizer, outer_loader, model_copy, opt, inner_batch=input)
+  File "/scratch/homes/sfan/NeuralOptGrok/src/train.py", line 195, in amp_update
+    pdb.set_trace()
+  File "/scratch/homes/sfan/NeuralOptGrok/src/train.py", line 195, in amp_update
+    pdb.set_trace()
+  File "/opt/conda/lib/python3.10/bdb.py", line 90, in trace_dispatch
+    return self.dispatch_line(frame)
+  File "/opt/conda/lib/python3.10/bdb.py", line 115, in dispatch_line
+    if self.quitting: raise BdbQuit
+bdb.BdbQuit
