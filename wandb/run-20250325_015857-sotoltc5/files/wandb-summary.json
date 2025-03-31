@@ -1,1 +1,0 @@
-{"global_step": 1, "weight_norm": 123.04579162597656, "weight_entropy": NaN, "grad_norm": 5.385164737701416, "grad_entropy": NaN, "_timestamp": 1742864348.7978714, "_runtime": 10.774787425994873, "_step": 1, "_wandb": {"runtime": 10}}

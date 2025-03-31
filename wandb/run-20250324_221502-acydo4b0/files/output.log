@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "/scratch/homes/sfan/NeuralOptGrok/src/run.py", line 106, in <module>
-    run(args)
-  File "/scratch/homes/sfan/NeuralOptGrok/src/run.py", line 71, in run
-    print(f"Load task dataset for [{args.task_type} mod {p}]...")
-NameError: name 'p' is not defined
