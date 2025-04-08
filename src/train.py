@@ -85,7 +85,7 @@ def train(args,
             
             if args.neuralgrok:
                 transform_grads(model, amp, is_inner=True)
-                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+                # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             
             if it<10 or (it<1000 and it%64==0) or (it>1000 and it%500==0) == 0:
                 w_norm, w_entropy, g_norm, g_entropy = get_entropy(model)
