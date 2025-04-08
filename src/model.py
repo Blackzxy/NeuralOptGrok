@@ -24,7 +24,7 @@ class NeuralAmplifier(nn.Module):
                  hidden_dims=[64, 64], 
                  output_dim=1, 
                  dropout_rate=0.1,
-                 c_norm=1.0):
+                 c_norm=0.2):
         super().__init__()
         layers = []
         prev_dim = input_dim # param-wise: input_dim=1; all_grad: input_dim = concat_grad_dim
@@ -34,15 +34,14 @@ class NeuralAmplifier(nn.Module):
             layers.extend([
                 nn.Linear(prev_dim, dim),
                 nn.ReLU(),
-                nn.Dropout(dropout_rate)
             ])
             prev_dim = dim
         
         # Output layer
         layers.append(nn.Linear(prev_dim, output_dim))
-        layers.append(nn.Softmax(dim=-1))
+        layers.append(nn.Softmax(dim=0))
         self.network = nn.Sequential(*layers)
-        self.network.apply(init_weights)
+        #self.network.apply(init_weights)
         self.c_norm = c_norm
     
     def forward(self, g):
@@ -109,63 +108,63 @@ class Decoder(nn.Module):
         logits = self.head(h) # seq_len, batch, num_tokens
         return logits 
     
-if __name__ == "__main__":
-    torch.autograd.set_detect_anomaly(True)
+# if __name__ == "__main__":
+#     torch.autograd.set_detect_anomaly(True)
     
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--wandb_proj', default='NeuralGrok', type=str)
-    parser.add_argument('--wandb_run', default=None, type=str)
+#     import argparse
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument('--wandb_proj', default='NeuralGrok', type=str)
+#     parser.add_argument('--wandb_run', default=None, type=str)
     
-    parser.add_argument("--label", default="")
-    parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--p", type=int, default=97)
-    parser.add_argument("--budget", type=int, default=1e6)
-    parser.add_argument("--batch_size", type=int, default=512)
-    parser.add_argument("--lr", type=float, default=1e-3)
-    parser.add_argument("--beta1", type=float, default=0.9)
-    parser.add_argument("--beta2", type=float, default=0.98)
-    parser.add_argument("--weight_decay", type=float, default=0)
-    parser.add_argument("--optimizer", default="Adam")
-    parser.add_argument("--n_heads", type=int, default=4)
-    parser.add_argument("--dim", type=int,default=128)
-    parser.add_argument("--n_layers",type=int, default=2)
-    parser.add_argument("--seq_len",type=int, default=5)
-    parser.add_argument("--interval", type=int, default=1000)
-    parser.add_argument("--t", type=int, default=2)
-    parser.add_argument("--neural_hidden_dims", type=str, default="64,128,64")
-    parser.add_argument("--neural_grad", action='store_true')
-    parser.add_argument("--tl_eval", action="store_true")
-    parser.add_argument("--aux_loss", action="store_true")
-    parser.add_argument("--track_grad", action="store_true")
-    parser.add_argument("--fft", action="store_true")
-    parser.add_argument("--device", type=str,default="cuda")
+#     parser.add_argument("--label", default="")
+#     parser.add_argument("--seed", type=int, default=0)
+#     parser.add_argument("--p", type=int, default=97)
+#     parser.add_argument("--budget", type=int, default=3e5)
+#     parser.add_argument("--batch_size", type=int, default=512)
+#     parser.add_argument("--lr", type=float, default=1e-3)
+#     parser.add_argument("--beta1", type=float, default=0.9)
+#     parser.add_argument("--beta2", type=float, default=0.98)
+#     parser.add_argument("--weight_decay", type=float, default=0)
+#     parser.add_argument("--optimizer", default="Adam")
+#     parser.add_argument("--n_heads", type=int, default=4)
+#     parser.add_argument("--dim", type=int,default=128)
+#     parser.add_argument("--n_layers",type=int, default=2)
+#     parser.add_argument("--seq_len",type=int, default=5)
+#     parser.add_argument("--interval", type=int, default=1000)
+#     parser.add_argument("--t", type=int, default=2)
+#     parser.add_argument("--neural_hidden_dims", type=str, default="64,128,64")
+#     parser.add_argument("--neural_grad", action='store_true')
+#     parser.add_argument("--tl_eval", action="store_true")
+#     parser.add_argument("--aux_loss", action="store_true")
+#     parser.add_argument("--track_grad", action="store_true")
+#     parser.add_argument("--fft", action="store_true")
+#     parser.add_argument("--device", type=str,default="cuda")
 
-    # Grokfast
-    parser.add_argument("--filter", type=str, choices=["none", "ma", "ema", "fir", "meta"], default="none")
-    parser.add_argument("--alpha", type=float, default=0.99)
-    parser.add_argument("--window_size", type=int, default=100)
-    parser.add_argument("--lamb", type=float, default=2.0)
+#     # Grokfast
+#     parser.add_argument("--filter", type=str, choices=["none", "ma", "ema", "fir", "meta"], default="none")
+#     parser.add_argument("--alpha", type=float, default=0.99)
+#     parser.add_argument("--window_size", type=int, default=100)
+#     parser.add_argument("--lamb", type=float, default=2.0)
 
-    # Ablation studies
-    parser.add_argument("--two_stage", action='store_true')
-    parser.add_argument("--save_weights", action='store_true')
-    parser.add_argument("--with_tracking", action="store_true")
+#     # Ablation studies
+#     parser.add_argument("--two_stage", action='store_true')
+#     parser.add_argument("--save_weights", action='store_true')
+#     parser.add_argument("--with_tracking", action="store_true")
     
-    args = parser.parse_args()
-    torch.manual_seed(args.seed)
+#     args = parser.parse_args()
+#     torch.manual_seed(args.seed)
     
-    model = Decoder(
-        dim=args.dim, num_layers=args.n_layers, num_heads=args.n_heads, num_tokens=args.p + 4, seq_len=args.seq_len,
-    ).to(args.device)
+#     model = Decoder(
+#         dim=args.dim, num_layers=args.n_layers, num_heads=args.n_heads, num_tokens=args.p + 4, seq_len=args.seq_len,
+#     ).to(args.device)
     
-    hidden_dims = [int(h) for h in args.neural_hidden_dims.split()]
-    amp = NeuralAmplifier(
-        input_dim=1,
-        hidden_dims=hidden_dims,
-        output_dim=1,
-    ).to(device)
+#     hidden_dims = [int(h) for h in args.neural_hidden_dims.split()]
+#     amp = NeuralAmplifier(
+#         input_dim=1,
+#         hidden_dims=hidden_dims,
+#         output_dim=1,
+#     ).to(device)
     
-    import pdb
-    pdb.set_trace()
+#     import pdb
+#     pdb.set_trace()
     

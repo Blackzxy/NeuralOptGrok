@@ -25,13 +25,13 @@ parser.add_argument('--wandb_run', default=None, type=str)
 parser.add_argument("--label", default="")
 parser.add_argument("--seed", type=int, default=0)
 parser.add_argument("--p", type=int, default=97)
-parser.add_argument("--budget", type=int, default=1e6)
-parser.add_argument("--batch_size", type=int, default=128)
+parser.add_argument("--budget", type=int, default=3e5)
+parser.add_argument("--batch_size", type=int, default=512)
 parser.add_argument("--lr", type=float, default=1e-3)
 parser.add_argument("--beta1", type=float, default=0.9)
 parser.add_argument("--beta2", type=float, default=0.98)
-parser.add_argument("--weight_decay", type=float, default=1e-2)
-parser.add_argument("--optimizer", default="AdamW")
+parser.add_argument("--weight_decay", type=float, default=1e-3)
+parser.add_argument("--optimizer", default="Adam")
 parser.add_argument("--n_heads", type=int, default=4)
 parser.add_argument("--dim", type=int,default=128)
 parser.add_argument("--n_layers",type=int, default=2)
@@ -65,26 +65,43 @@ def run(args):
         project=args.wandb_proj,
         name=wandb_run_name,
     )
-    torch.manual_seed(args.seed)
+    
     
     # get data
     print(f"Load task dataset for [{args.task_type} mod {args.p}]...")
     dataset, seq_len = get_dataset(args.task_type, p=args.p)
-    inner_loader, outer_loader, test_loader = get_dataloader(dataset, p_train=0.5, p_outer=0.01)
-    
+ 
+    print("Seq_len = ", seq_len)
+
+    torch.manual_seed(args.seed)
+
     model = Decoder(
         dim=args.dim, num_layers=args.n_layers, num_heads=args.n_heads, 
-        num_tokens=args.p + 4, seq_len=seq_len,
+        num_tokens=args.p + 3, seq_len=seq_len,
     ).to(args.device)
+
+    print(model)
     
     amp = None
     if args.neuralgrok:
+        
         hidden_dims = [int(h) for h in args.neural_hidden_dims.split(",")]
         amp = NeuralAmplifier(
             input_dim=1,
             hidden_dims=hidden_dims,
             output_dim=1,
         ).to(args.device)
+
+
+        print(amp)
+        # for name, param in amp.named_parameters():
+        #     print(name, param)
+        # sys.exit()
+    
+    if args.neuralgrok:
+        inner_loader, outer_loader, test_loader = get_dataloader(dataset, p_train=0.5, p_outer=0.01)
+    else:
+        inner_loader, outer_loader, test_loader = get_dataloader(dataset, p_train=0.5, p_outer=0)
     
     # start training
     print("== Training Starts 🧨 ==")
@@ -100,6 +117,7 @@ def run(args):
     print("== Training Finished! 🎏 ==")
 
 if __name__ == "__main__":
+    
     torch.autograd.set_detect_anomaly(True)
     
     args = parser.parse_args()

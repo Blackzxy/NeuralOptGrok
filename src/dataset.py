@@ -19,7 +19,7 @@ class ab_mod_p_data(Dataset):
         eq = torch.ones_like(a) * eq_token
         op1 = torch.ones_like(a) * op_token1
         result = (a * b) % p
-        return torch.stack([a, op1, b, eq, result])
+        return torch.stack([a, b, op1, eq, result])
 
     def __len__(self):
         return self.data.shape[1]
@@ -44,7 +44,7 @@ class a_plus_b_mod_p_data(Dataset):
         eq = torch.ones_like(a) * eq_token
         op1 = torch.ones_like(a) * op_token1
         result = (a + b) % p
-        return torch.stack([a, op1, b, eq, result])
+        return torch.stack([a, b, op1,  eq, result])
 
     def __len__(self):
         return self.data.shape[1]
@@ -69,7 +69,7 @@ class a_minus_b_mod_p_data(Dataset):
         eq = torch.ones_like(a) * eq_token
         op1 = torch.ones_like(a) * op_token1
         result = (a - b) % p
-        return torch.stack([a, op1, b, eq, result])
+        return torch.stack([a, b, op1, eq, result])
 
     def __len__(self):
         return self.data.shape[1]
@@ -84,7 +84,7 @@ class aa_sub_b_mod_p_data(Dataset):
     
     def generate_data(self, p, eq_token, op_token1, op_token2):
         """
-        (a-b+c) % p for 0 <= a, c < p, 0< b< p
+        (a*a-b) % p for 0 <= a < p, 0< b< p
         """
         a = torch.arange(p)
         b = torch.arange(1,p)
@@ -94,7 +94,7 @@ class aa_sub_b_mod_p_data(Dataset):
         op1 = torch.ones_like(a) * op_token1
         op2 = torch.ones_like(a) * op_token2
         result = (a * a - b) % p
-        return torch.stack([a, op1, a, op2, b, eq, result])
+        return torch.stack([a, b, op1, op2, eq, result])
 
 
     def __len__(self):
@@ -110,7 +110,7 @@ class ac_plus_bd_sub_e_mod_p_data(Dataset):
     
     def generate_data(self, p, eq_token, op_token1, op_token2, op_token3):
         """
-        (a*c+b*d-e) % p for 0 <= a, c < p, 0< b< p
+        (a*c+b*d-e) % p for 0 <= a, b, e < p, 0< c, b< p
         """
         a = torch.arange(p)
         b = torch.arange(p)
@@ -124,8 +124,8 @@ class ac_plus_bd_sub_e_mod_p_data(Dataset):
         op2 = torch.ones_like(a) * op_token2
         op3 = torch.ones_like(a) * op_token3
         result = (a * c + b * d - e) % p
-        return torch.stack([a, op1, b, op2, c, op1, d, op3, e, eq, result])
-
+        return torch.stack([a, b, c, d, e, op1, op2, op3, eq, result])
+    
     def __len__(self):
         return self.data.shape[1]
 
@@ -148,7 +148,12 @@ def get_dataset(task_type:str = "ac+bd-e",
     op_token2 = p + 2
     op_token3 = p + 3
     
-    seq_len = len(task_type) + 2
+    if task_type == "axc+bxd-e":
+        seq_len = 10
+    elif task_type == "axa-b":
+        seq_len = 6
+    else:
+        seq_len = len(task_type) + 2
     dataset = TASK2DATASET[task_type](p=p,
                                       eq_token=eq_token,
                                       op_token1=op_token1,
@@ -158,15 +163,21 @@ def get_dataset(task_type:str = "ac+bd-e",
 
 def get_dataloader(dataset,
                    p_train=0.5, 
-                   p_outer=0., 
+                   p_outer=0.01, 
                    batch_size=512):
     assert p_outer < p_train
-    train_size = int(p_train * len(dataset))
-    test_size = len(dataset) - train_size
+    p_inner = p_train - p_outer
+    inner_size = int(p_inner * len(dataset))
     outer_size = int(p_outer * len(dataset))
-    inner_size = train_size - outer_size
+    test_size = len(dataset) - inner_size - outer_size
+
+    # train_size = int(p_train * len(dataset))
+    # test_size = len(dataset) - train_size
+    # outer_size = int(p_outer * len(dataset))
+    # inner_size = train_size - outer_size
     
     inner_data, outer_data, test_data = torch.utils.data.random_split(dataset, [inner_size, outer_size, test_size])
+    print(len(outer_data))
 
     inner_loader = DataLoader(inner_data,
                               batch_size=batch_size,
@@ -179,8 +190,8 @@ def get_dataloader(dataset,
                               shuffle=False)
     return inner_loader, outer_loader, test_loader
 
-if __name__ == "__main__":
-    dataset, seq_len = get_dataset("a+b", p=97)
-    inner_loader, outer_loader, test_loader = get_dataloader(dataset, p_train=0.5, p_outer=0.01)
-    import pdb
-    pdb.set_trace()
+# if __name__ == "__main__":
+#     dataset, seq_len = get_dataset("a+b", p=97)
+#     inner_loader, outer_loader, test_loader = get_dataloader(dataset, p_train=0.5, p_outer=0.01)
+#     import pdb
+#     pdb.set_trace()

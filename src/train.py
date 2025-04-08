@@ -25,9 +25,11 @@ def train(args,
           inner_loop_steps = 1,
           wandb_report = True):
     nparams = sum([p.numel() for p in model.parameters() if p.requires_grad])
-    nparams_amp = sum([p.numel() for p in amp.parameters() if p.requires_grad])
+    if amp is not None:
+        nparams_amp = sum([p.numel() for p in amp.parameters() if p.requires_grad])
+        print(f'num. params in amplifier: [{nparams_amp}]')
     print(f'num. params in base model: [{nparams/1e6}M]')
-    print(f'num. params in amplifier: [{nparams_amp}]')
+    
     
     optimizer = getattr(torch.optim, args.optimizer)(
         model.parameters(),
@@ -35,11 +37,11 @@ def train(args,
         weight_decay=args.weight_decay,
         betas=(args.beta1, args.beta2),
     )
-    if amp is not None:
+    if args.neuralgrok:
         meta_optimizer = getattr(torch.optim, args.optimizer)(
                 amp.parameters(),
                 lr=1e-4,
-                weight_decay = 1e-6,
+                weight_decay = args.weight_decay,
                 betas=(args.beta1, args.beta2),
             )
     scheduler = torch.optim.lr_scheduler.LambdaLR(
@@ -62,24 +64,28 @@ def train(args,
         model.train()
         epoch_train_loss, epoch_train_acc = 0, 0
         for input in inner_loader:
+            it += 1
             input = input.to(device).long().transpose(0,1)
             
-            if amp is not None and (it+2) % inner_loop_steps == 0:
-                model_copy = copy.deepcopy(model)
-                model_copy.zero_grad()
+            # if amp is not None and (it+2) % inner_loop_steps == 0:
+            #     model_copy = copy.deepcopy(model)
+            #     model_copy.zero_grad()
                     
+            with torch.set_grad_enabled(True):
+                logits = model(input[:-1])
+                # calculate loss only on the answer part of the equation (last element
+                loss = F.cross_entropy(logits[-1], input[-1])
+
             model.zero_grad()
-            logits = model(input[:-1])
-            # calculate loss only on the answer part of the equation (last element
-            loss = F.cross_entropy(logits[-1], input[-1])
             loss.backward()
             
             acc = (logits[-1].argmax(-1) == input[-1]).float().mean()
             epoch_train_acc += acc.item()
             epoch_train_loss += loss.item()
             
-            if amp is not None:
+            if args.neuralgrok:
                 transform_grads(model, amp, is_inner=True)
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             
             if it<10 or (it<1000 and it%64==0) or (it>1000 and it%500==0) == 0:
                 w_norm, w_entropy, g_norm, g_entropy = get_entropy(model)
@@ -96,16 +102,16 @@ def train(args,
                     "grad_entropy": g_entropy,
                 }, commit=True)
             
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            
             optimizer.step()  
             scheduler.step()
             
-            if amp is not None and (it+1) % inner_loop_steps == 0:
-                opt = torch.optim.SGD(model_copy.parameters(), lr=1e-3)
-                amp_update(amp, meta_optimizer, outer_loader, model_copy, opt, inner_batch=input, device=args.device)
-                del model_copy
-                del opt
-            it += 1
+            if args.neuralgrok and (it % inner_loop_steps == 0):
+                model_copy = copy.deepcopy(model)
+                model_copy.zero_grad()
+                amp_update(args, amp, meta_optimizer, outer_loader, model_copy, inner_batch=input, device=args.device)
+               
+            # it += 1
         epoch_train_loss /= len(inner_loader)
         epoch_train_acc /= len(inner_loader)
         
@@ -127,22 +133,23 @@ def train(args,
 
 def eval_model(test_loader, model, device):
     epoch_test_loss, epoch_test_acc = 0, 0
-    model.eval()
-    for input in test_loader:
-        input = input.to(device).long().transpose(0,1)
-        logits = model(input[:-1])
-        # calculate loss only on the answer part of the equation (last element
-        loss = F.cross_entropy(logits[-1], input[-1])
-        acc = (logits[-1].argmax(-1) == input[-1]).float().mean()
-        epoch_test_acc += acc.item()
-        epoch_test_loss += loss.item()
-    epoch_test_loss /= len(test_loader)
-    epoch_test_acc /= len(test_loader)
+
+    with torch.set_grad_enabled(False):
+        for input in test_loader:
+            input = input.to(device).long().transpose(0,1)
+            logits = model(input[:-1])
+            # calculate loss only on the answer part of the equation (last element
+            loss = F.cross_entropy(logits[-1], input[-1])
+            acc = (logits[-1].argmax(-1) == input[-1]).float().mean()
+            epoch_test_acc += acc.item()
+            epoch_test_loss += loss.item()
+        epoch_test_loss /= len(test_loader)
+        epoch_test_acc /= len(test_loader)
     return epoch_test_loss, epoch_test_acc
 
 def get_metric(w):
-    norm = w.norm()
-    entropy = -torch.sum(torch.abs(w)*torch.log(torch.abs(w)))
+    norm = w.norm().item()
+    entropy = -torch.sum(torch.abs(w)*torch.log(torch.abs(w))).item()
     return norm, entropy
 
 def get_entropy(model):
@@ -160,15 +167,15 @@ def get_entropy(model):
     return w_norm, w_entropy, g_norm, g_entropy
     
 def transform_grads(model, amp, is_inner=True):
-    if is_inner:
-        amp.eval()
-    else:
-        amp.train()
+    # if is_inner:
+    #     amp.eval()
+    # else:
+    #     amp.train()
     
     trans_grads = {}
     for name, param in model.named_parameters():
-        if not param.requires_grad:
-            continue
+        # if not param.requires_grad:
+        #     continue
         grad = param.grad.view(-1,1)
         grad_trans = amp(grad)
         param.grad = grad_trans.view(param.shape)
@@ -176,6 +183,7 @@ def transform_grads(model, amp, is_inner=True):
     return trans_grads 
 
 def trans_module_weights(model_copy, amp, lr=1e-3):
+
     for name, module in model_copy.named_modules():
         if hasattr(module, "weight"):
             grad = module.weight.grad.view(-1,1)
@@ -227,46 +235,34 @@ def trans_module_weights(model_copy, amp, lr=1e-3):
     #     import pdb
     #     pdb.set_trace()
     
-def amp_update(amp, meta_opt, outer_loader, model_copy, opt, inner_batch, device):
-    amp.train()
+def amp_update(args, amp, meta_opt, outer_loader, model_copy, inner_batch, device):
     amp.zero_grad()
-    meta_opt.zero_grad(set_to_none=True)
     
-    lr = 1e-4
     logits_cp = model_copy(inner_batch[:-1])
     loss_cp = F.cross_entropy(logits_cp[-1], inner_batch[-1])
     loss_cp.backward(retain_graph=False)
     
-    trans_module_weights(model_copy, amp)
+    trans_module_weights(model_copy, amp, lr=args.lr)
     
-    # trans_grads = transform_grads(model_copy, amp, is_inner=False)
-    # names = []
-    # weights = {}
-    # for name, param in model_copy.named_parameters():
-    #     weights[name] = param.data
-    
-    # for name in names:
-    #     w = weights[name]
-    #     model_copy.__getattr__(name.split(".")[0]).__delattr__(name.split(".")[1])
-    #     model_copy.__getattr__(name.split(".")[0]).__setattr__(name.split(".")[1], w - lr * trans_grads[name])
-
-    # opt.step()
     
     outer_loss = 0
-    # model_copy.eval()
     for input in outer_loader:
         input = input.to(device).long().transpose(0,1)
         logits = model_copy(input[:-1])
         outer_loss += F.cross_entropy(logits[-1], input[-1])
     
     outer_loss /= len(outer_loader)
+
+    meta_opt.zero_grad(set_to_none=True)
     outer_loss.backward(retain_graph=True)
-    check_amp_grads(amp)
+    #check_amp_grads(amp) ## check if the gradients are None
     meta_opt.step()
     return outer_loss.item()
     
 def check_amp_grads(amp):
     for name, param in amp.named_parameters():
+        # print(param.grad)
+        # sys.exit()
         # import pdb
         # pdb.set_trace()
         assert param.grad is not None, "Outer-loop fails!"
