@@ -1,14 +1,20 @@
 # NeuralOptGrok
 
 ## Usage
-First clone the repo of *Grokfast*, and prepare the environment.
 
-Our `main.py` contains the Neural Optimizer which is used for the fasten the grokking.
+You can run the experiments in the following codes:
+```bash
+bash scripts/neuralgrok/task1.sh
+```
 
+For the model *NeuralGrok*, it is defined in `src/model.py`. 
 
-Example Command:
-
-`python main.py --p 97 --dim 128 --n_layers 2 --n_heads 4 --lr 1e-3 --neural_grad --neural_layers 3  --neural_alpha 10  --neural_beta 4  --inner_steps 1  --aux_loss`
+Note that in different tasks, you may need to change the `num_tokens` in `src/run.py` Line 80 accordingly:
+```
+a+b, a-b, axb: num_tokens=args.p + 2;
+axa-b: num_tokens=args.p + 3;
+axc+bxd-e: num_tokens=args.p + 4;
+```
 
 
 

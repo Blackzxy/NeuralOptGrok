@@ -77,7 +77,7 @@ def run(args):
 
     model = Decoder(
         dim=args.dim, num_layers=args.n_layers, num_heads=args.n_heads, 
-        num_tokens=args.p + 3, seq_len=seq_len,
+        num_tokens=args.p + 2, seq_len=seq_len,
     ).to(args.device)
 
     print(model)
