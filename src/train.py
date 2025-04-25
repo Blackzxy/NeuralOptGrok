@@ -25,12 +25,14 @@ def train(args,
           inner_loop_steps = 1,
           wandb_report = True):
     nparams = sum([p.numel() for p in model.parameters() if p.requires_grad])
+    print(f'num. params in base model: [{nparams/1e6}M]')
+
     if amp is not None:
         nparams_amp = sum([p.numel() for p in amp.parameters() if p.requires_grad])
         print(f'num. params in amplifier: [{nparams_amp}]')
-    print(f'num. params in base model: [{nparams/1e6}M]')
     
     
+    ## optimizer for the model
     optimizer = getattr(torch.optim, args.optimizer)(
         model.parameters(),
         lr=args.lr,
@@ -38,6 +40,7 @@ def train(args,
         betas=(args.beta1, args.beta2),
     )
     if args.neuralgrok:
+        ## optimizer for the amplifier
         meta_optimizer = getattr(torch.optim, args.optimizer)(
                 amp.parameters(),
                 lr=1e-4,
@@ -109,6 +112,7 @@ def train(args,
             if args.neuralgrok and (it % inner_loop_steps == 0):
                 model_copy = copy.deepcopy(model)
                 model_copy.zero_grad()
+                # update the amplifier
                 amp_update(args, amp, meta_optimizer, outer_loader, model_copy, inner_batch=input, device=args.device)
                
             # it += 1
@@ -177,7 +181,7 @@ def transform_grads(model, amp, is_inner=True):
         # if not param.requires_grad:
         #     continue
         grad = param.grad.view(-1,1)
-        grad_trans = amp(grad)
+        grad_trans = amp(grad) # transform the gradient
         param.grad = grad_trans.view(param.shape)
         trans_grads[name] = grad_trans.view(param.shape)
     return trans_grads 
@@ -238,13 +242,14 @@ def trans_module_weights(model_copy, amp, lr=1e-3):
 def amp_update(args, amp, meta_opt, outer_loader, model_copy, inner_batch, device):
     amp.zero_grad()
     
+    ## current input batch
     logits_cp = model_copy(inner_batch[:-1])
     loss_cp = F.cross_entropy(logits_cp[-1], inner_batch[-1])
     loss_cp.backward(retain_graph=False)
     
     trans_module_weights(model_copy, amp, lr=args.lr)
     
-    
+    ## compute the outer loss
     outer_loss = 0
     for input in outer_loader:
         input = input.to(device).long().transpose(0,1)

@@ -24,7 +24,8 @@ class NeuralAmplifier(nn.Module):
                  hidden_dims=[64, 64], 
                  output_dim=1, 
                  dropout_rate=0.1,
-                 c_norm=0.2):
+                 c_norm=0.2 ## recommend to use c=0.2 to achieve faster grokking
+                 ):
         super().__init__()
         layers = []
         prev_dim = input_dim # param-wise: input_dim=1; all_grad: input_dim = concat_grad_dim

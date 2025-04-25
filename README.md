@@ -1,11 +1,13 @@
 # NeuralOptGrok
-
+This code repo is for the paper [NeuralGrok:
+Accelerate Grokking by Neural Gradient Transformation](https://arxiv.org/pdf/2504.17243)
 ## Usage
 
-You can run the experiments in the following codes:
+You can run the experiments in the following codes (Please don't forget to previde your personal WANDB API keys):
 ```bash
 bash scripts/neuralgrok/task1.sh
 ```
+
 
 For the model *NeuralGrok*, it is defined in `src/model.py`. 
 
